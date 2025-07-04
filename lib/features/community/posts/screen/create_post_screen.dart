@@ -1,5 +1,6 @@
-import 'dart:io';
+import 'dart:io' if (dart.library.html) 'dart:html' as html;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,7 +24,7 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
-  List<File> postResultImages = [];
+  List<dynamic> postResultImages = []; // Use dynamic to handle File and XFile
   PostServices communityServices = PostServices();
   final TextEditingController _textEditingController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
@@ -31,30 +32,55 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   bool isLoading = false;
 
   Future<void> _pickImages() async {
-    final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.isNotEmpty) {
-      setState(() {
-        postResultImages.addAll(
-          pickedFiles.map((pickedFile) => File(pickedFile.path)),
-        );
-      });
+    try {
+      final pickedFiles = await _picker.pickMultiImage();
+      if (pickedFiles.isNotEmpty) {
+        setState(() {
+          if (kIsWeb) {
+            // On web, store XFile directly
+            postResultImages.addAll(pickedFiles);
+          } else {
+            // On mobile, convert XFile to File
+            postResultImages.addAll(
+              pickedFiles.map((pickedFile) => File(pickedFile.path)),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      showSnackBar(
+        context: context,
+        message: "Failed to pick images: $e",
+        title: "Error",
+      );
     }
   }
 
-  Future<List<String>> uploadAllImages(List<File> images) async {
+  Future<List<String>> uploadAllImages(List<dynamic> images) async {
     List<String> downloadUrls = [];
     try {
-      if (downloadUrls.isEmpty) {
-        for (File image in images) {
-          final downloadUrl = await _cloudinaryServices.uploadImage(image);
-          downloadUrls.add(downloadUrl!);
+      for (var image in images) {
+        String? downloadUrl;
+        if (kIsWeb) {
+          // For web, handle XFile
+          final bytes = await (image as XFile).readAsBytes();
+          downloadUrl = await _cloudinaryServices.uploadImageFromBytes(bytes);
+        } else {
+          // For mobile, handle File
+          downloadUrl = await _cloudinaryServices.uploadImage(image as File);
         }
-        return downloadUrls;
-      } else {
-        return downloadUrls;
+        if (downloadUrl != null) {
+          downloadUrls.add(downloadUrl);
+        }
       }
+      return downloadUrls;
     } catch (e) {
       print('Error uploading images: $e');
+      showSnackBar(
+        context: context,
+        message: "Failed to upload images: $e",
+        title: "Upload Error",
+      );
       return downloadUrls;
     }
   }
@@ -64,10 +90,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       setState(() {
         isLoading = true;
       });
-      final List<String> _downloadedUrls = await uploadAllImages(
-        postResultImages,
-      );
-      await communityServices.createNewPost(context, postText, _downloadedUrls);
+      final List<String> downloadedUrls = await uploadAllImages(postResultImages);
+      await communityServices.createNewPost(context, postText, downloadedUrls);
       setState(() {
         isLoading = false;
         _textEditingController.clear();
@@ -98,21 +122,22 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         leadingWidth: 90,
         centerTitle: true,
         leading: AppBarBackArrow(
-          onClick: () {
-            Navigator.pop(context);
-          },
+          onClick: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'New Post',
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         actions: [
           IconButton(
-            icon: isLoading ? const CupertinoActivityIndicator() : const Icon(Icons.check),
-            onPressed: (_textEditingController.text.trim().isNotEmpty || postResultImages.isNotEmpty)
+            icon: isLoading
+                ? const CupertinoActivityIndicator()
+                : const Icon(Icons.check),
+            onPressed: (_textEditingController.text.trim().isNotEmpty ||
+                    postResultImages.isNotEmpty)
                 ? () => _createPost(context, _textEditingController.text.trim())
                 : null,
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -120,96 +145,74 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           children: [
             postResultImages.isNotEmpty
                 ? SingleChildScrollView(
-              child: Column(
-                children: [
-                  for (int i = 0; i < (postResultImages.length / 3).ceil(); i++)
-                    Row(
+                    child: Column(
                       children: [
-                        for (int j = 0; j < 3; j++)
-                          Expanded(
-                            child: (i * 3 + j) < postResultImages.length
-                                ? Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Container(
-                                height: 100,
-                                width: 100,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(0),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      height: MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width,
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(0),
-                                      ),
-                                      child: Image.file(
-                                        postResultImages[i * 3 + j],
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Center(
-                                            child: Image.asset(
-                                              AppIcons.koradLogo,
-                                              color: Colors.grey,
-                                              width: 18,
-                                              height: 18,
+                        for (int i = 0; i < (postResultImages.length / 3).ceil(); i++)
+                          Row(
+                            children: [
+                              for (int j = 0; j < 3; j++)
+                                Expanded(
+                                  child: (i * 3 + j) < postResultImages.length
+                                      ? Padding(
+                                          padding: const EdgeInsets.all(1.0),
+                                          child: Container(
+                                            height: 100,
+                                            width: 100,
+                                            clipBehavior: Clip.antiAlias,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius: BorderRadius.circular(0),
                                             ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    Container(
-                                      height: MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width,
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.2),
-                                      ),
-                                      child: Center(
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              postResultImages.removeAt(i * 3 + j);
-                                            });
-                                          },
-                                          icon: const Icon(
-                                            IconlyBold.delete,
-                                            color: Colors.white,
-                                            size: 18,
+                                            child: Stack(
+                                              children: [
+                                                _buildImageWidget(i * 3 + j),
+                                                Container(
+                                                  height: MediaQuery.of(context).size.height,
+                                                  width: MediaQuery.of(context).size.width,
+                                                  clipBehavior: Clip.antiAlias,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black.withOpacity(0.2),
+                                                  ),
+                                                  child: Center(
+                                                    child: IconButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          postResultImages.removeAt(i * 3 + j);
+                                                        });
+                                                      },
+                                                      icon: const Icon(
+                                                        IconlyBold.delete,
+                                                        color: Colors.white,
+                                                        size: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                        )
+                                      : const SizedBox.shrink(),
                                 ),
-                              ),
-                            )
-                                : const SizedBox.shrink(),
+                            ],
                           ),
                       ],
                     ),
-                ],
-              ),
-            )
+                  )
                 : GestureDetector(
-              onTap: _pickImages,
-              child: Container(
-                height: 200,
-                color: Colors.grey.withOpacity(0.1),
-                child: const Center(
-                  child: Icon(
-                    IconlyLight.camera,
-                    size: 40,
-                    color: Colors.grey,
+                    onTap: _pickImages,
+                    child: Container(
+                      height: 200,
+                      color: Colors.grey.withOpacity(0.1),
+                      child: const Center(
+                        child: Icon(
+                          IconlyLight.camera,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -232,10 +235,64 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               decoration: BoxDecoration(
                 color: Colors.grey[300],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildImageWidget(int index) {
+    final image = postResultImages[index];
+    if (kIsWeb) {
+      // For web, use Image.memory with bytes from XFile
+      return FutureBuilder<Uint8List>(
+        future: (image as XFile).readAsBytes(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Image.memory(
+              snapshot.data!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Center(
+                  child: Image.asset(
+                    AppIcons.koradLogo,
+                    color: Colors.grey,
+                    width: 18,
+                    height: 18,
+                  ),
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Image.asset(
+                AppIcons.koradLogo,
+                color: Colors.grey,
+                width: 18,
+                height: 18,
+              ),
+            );
+          }
+          return const Center(child: CupertinoActivityIndicator());
+        },
+      );
+    } else {
+      // For mobile, use Image.file
+      return Image.file(
+        image as File,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Image.asset(
+              AppIcons.koradLogo,
+              color: Colors.grey,
+              width: 18,
+              height: 18,
+            ),
+          );
+        },
+      );
+    }
   }
 }
