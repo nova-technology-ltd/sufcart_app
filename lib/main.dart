@@ -80,6 +80,7 @@ class MyApp extends StatelessWidget {
           //   primarySwatch: Colors.blue,
           //   visualDensity: VisualDensity.adaptivePlatformDensity,
           // ),
+
           // theme: ThemeData.light(),
           theme: themeProvider.getTheme(),
           darkTheme: ThemeData.dark(),
