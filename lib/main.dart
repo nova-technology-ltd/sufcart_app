@@ -84,12 +84,7 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.getTheme(),
           darkTheme: ThemeData.dark(),
           themeMode: ThemeMode.system,
-          // home: const TestScreen(),
-          // home: const MapsScreen(),
           home: const SplashScreen(),
-          // home: const InChatImageViewScreen(imageUrl: 'https://picsum.photos/800/600',),
-          // home: const CreateProductScreen(),
-          // home: const AddProductScreen(),
         ),
       ),
     );
