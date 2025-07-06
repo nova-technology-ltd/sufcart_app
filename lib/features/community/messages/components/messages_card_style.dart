@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
@@ -25,11 +26,27 @@ class MessagesCardStyle extends StatefulWidget {
 }
 
 class _MessagesCardStyleState extends State<MessagesCardStyle> {
+  Timer? _statusPollingTimer;
+
   @override
   void initState() {
     super.initState();
     final messagesProvider = Provider.of<MessagesSocketProvider>(context, listen: false);
+    print('MessagesCardStyle init for userID: ${widget.user.userID}, roomID: ${widget.roomID}');
     messagesProvider.joinChat(widget.user.userID);
+    messagesProvider.requestUserStatus(widget.user.userID);
+    // Periodic polling as a fallback
+    _statusPollingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      print('Polling status for userID: ${widget.user.userID}');
+      messagesProvider.requestUserStatus(widget.user.userID);
+    });
+  }
+
+  @override
+  void dispose() {
+    print('Disposing MessagesCardStyle for userID: ${widget.user.userID}');
+    _statusPollingTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -39,16 +56,22 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
     return Selector<MessagesSocketProvider, (List<MessagesModel>, String?, bool, UserModel)>(
       selector: (context, provider) => (
       provider.fetchChatHistory(widget.roomID),
-      provider.getUserStatus(widget.roomID, widget.user.userID),
+      provider.getUserStatus(widget.roomID, widget.user.userID) ?? provider.chatUsers
+          .firstWhere((u) => u.userID == widget.user.userID, orElse: () => widget.user)
+          .status,
       provider.getTypingStatus(widget.roomID, widget.user.userID),
-      provider.chatUsers.firstWhere((u) => u.userID == widget.user.userID, orElse: () => widget.user),
+      provider.chatUsers.firstWhere(
+            (u) => u.userID == widget.user.userID,
+        orElse: () => widget.user,
+      ),
       ),
       builder: (context, data, child) {
         final messages = data.$1;
-        final isOnline = data.$2 == 'online';
+        final userStatus = data.$2 ?? 'offline';
         final isTyping = data.$3;
         final user = data.$4;
-        final lastMessage = user.lastMessage;
+
+        print('Rendering MessagesCardStyle for userID: ${user.userID}, status: $userStatus');
 
         // Calculate unread count
         final unreadCount = messages
@@ -62,14 +85,13 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4),
           child: GestureDetector(
             onTap: () {
-              // Mark unread messages as read
               final messagesProvider = Provider.of<MessagesSocketProvider>(context, listen: false);
               for (var msg in messages) {
                 if (msg.receiverID == currentUser.userID && !msg.isRead) {
+                  print('Marking message as read: ${msg.messageID}');
                   messagesProvider.markMessageAsRead(msg.messageID);
                 }
               }
-              // Navigate to ChatScreen
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -81,13 +103,12 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
               );
             },
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.transparent,
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Profile image with online status indicator
                   Stack(
                     children: [
                       SizedBox(
@@ -125,22 +146,21 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
                             ),
                             Padding(
                               padding: const EdgeInsets.all(5.0),
-                              child: isOnline ? Align(
+                              child: Align(
                                 alignment: Alignment.bottomRight,
-                                child: RadarCircleIndicator(
+                                child: userStatus == "online"
+                                    ? RadarCircleIndicator(
                                   size: 12,
                                   color: Colors.green,
                                   animationSpeed: 5,
                                   circleCount: 3,
                                 )
-                              ) : Align(
-                                alignment: Alignment.bottomRight,
-                                child: Container(
+                                    : Container(
                                   height: 15,
                                   width: 15,
                                   decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                    border: Border.all(width: 1.5, color: Colors.grey)
+                                    shape: BoxShape.circle,
+                                    border: Border.all(width: 1.5, color: Colors.grey),
                                   ),
                                   child: Center(
                                     child: Padding(
@@ -148,9 +168,9 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
                                       child: Container(
                                         height: 15,
                                         width: 15,
-                                        decoration: BoxDecoration(
-                                            color: Colors.grey,
-                                            shape: BoxShape.circle
+                                        decoration: const BoxDecoration(
+                                          color: Colors.grey,
+                                          shape: BoxShape.circle,
                                         ),
                                       ),
                                     ),
@@ -164,7 +184,6 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
                     ],
                   ),
                   const SizedBox(width: 4),
-                  // User info and message preview
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,10 +210,10 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
                           ),
                         ] else ...[
                           Text(
-                            lastMessage != null
-                                ? (lastMessage.content.isNotEmpty
-                                ? lastMessage.content
-                                : lastMessage.images != null
+                            user.lastMessage != null
+                                ? (user.lastMessage!.content.isNotEmpty
+                                ? user.lastMessage!.content
+                                : user.lastMessage!.images != null && user.lastMessage!.images!.isNotEmpty
                                 ? 'Image'
                                 : 'No message')
                                 : 'No message',
@@ -206,16 +225,15 @@ class _MessagesCardStyleState extends State<MessagesCardStyle> {
                               color: unreadCount > 0 ? Colors.black : Colors.grey,
                             ),
                           ),
-                        ]
+                        ],
                       ],
                     ),
                   ),
-                  // Timestamp and unread count
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        _formatTimestamp(lastMessage?.createdAt),
+                        _formatTimestamp(user.lastMessage?.createdAt),
                         style: TextStyle(
                           fontSize: 11,
                           color: unreadCount > 0 ? Colors.black : Colors.grey,

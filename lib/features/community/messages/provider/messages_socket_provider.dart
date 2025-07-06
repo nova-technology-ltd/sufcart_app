@@ -33,16 +33,17 @@ class MessagesSocketProvider extends ChangeNotifier {
   void _init() {
     _messagesSubscription = _messageServices.messagesStream.listen((data) {
       final roomID = data['roomID'];
+      print('Messages stream update for roomID: $roomID');
       if (data['messages'] != null) {
         _userMessages[roomID] = (data['messages'] as List)
             .map((msg) => MessagesModel.fromMap(msg))
             .toList();
+        notifyListeners();
       } else if (data['message'] != null) {
         final message = MessagesModel.fromMap(data['message']);
         final messages = _userMessages[roomID] ?? [];
         if (!messages.any((msg) => msg.messageID == message.messageID)) {
           _userMessages[roomID] = messages + [message];
-          // Update lastMessage in chatUsers
           final userIndex = _chatUsers.indexWhere((user) {
             final ids = [user.userID, message.senderID, message.receiverID];
             ids.sort();
@@ -51,17 +52,19 @@ class MessagesSocketProvider extends ChangeNotifier {
           if (userIndex != -1) {
             _chatUsers[userIndex] = _chatUsers[userIndex].copyWith(lastMessage: message);
           }
+          notifyListeners();
         }
       }
-      notifyListeners();
     });
 
     _errorSubscription = _messageServices.errorStream.listen((message) {
+      print('Error stream update: $message');
       _errorMessage = message;
       notifyListeners();
     });
 
     _successSubscription = _messageServices.successStream.listen((data) {
+      print('Success stream update: $data');
       _successMessage = data['message'];
       final roomID = data['roomID'];
       if (roomID == null || roomID == 'unknown') return;
@@ -77,8 +80,12 @@ class MessagesSocketProvider extends ChangeNotifier {
         }
       } else if (data['userID'] != null && data['status'] != null) {
         _userStatuses.putIfAbsent(roomID, () => {});
-        _userStatuses[roomID]![data['userID']] = data['status'];
-        notifyListeners();
+        final previousStatus = _userStatuses[roomID]![data['userID']];
+        if (previousStatus != data['status']) {
+          print('Updating user status: userID=${data['userID']}, status=${data['status']}, roomID=$roomID');
+          _userStatuses[roomID]![data['userID']] = data['status'];
+          notifyListeners();
+        }
       } else if (data['userID'] != null && data['isTyping'] != null) {
         _userTypingStatuses.putIfAbsent(roomID, () => {});
         _userTypingStatuses[roomID]![data['userID']] = data['isTyping'];
@@ -92,7 +99,6 @@ class MessagesSocketProvider extends ChangeNotifier {
               isRead: data['isRead'],
               readAt: data['readAt'] != null ? DateTime.parse(data['readAt']) : null,
             );
-            // Update lastMessage in chatUsers if necessary
             final userIndex = _chatUsers.indexWhere((user) {
               final ids = [user.userID, messages[index].senderID, messages[index].receiverID];
               ids.sort();
@@ -110,36 +116,81 @@ class MessagesSocketProvider extends ChangeNotifier {
     });
 
     _usersSubscription = _messageServices.usersStream.listen((users) {
-      _chatUsers.clear();
-      _chatUsers.addAll(users);
+      print('Users stream update: ${users.map((u) => u.userID).toList()}');
+      for (var user in users) {
+        final existingIndex = _chatUsers.indexWhere((u) => u.userID == user.userID);
+        if (existingIndex != -1) {
+          _chatUsers[existingIndex] = _chatUsers[existingIndex].copyWith(
+            status: user.status ?? _chatUsers[existingIndex].status,
+            firstName: user.firstName.isNotEmpty ? user.firstName : _chatUsers[existingIndex].firstName,
+            lastName: user.lastName.isNotEmpty ? user.lastName : _chatUsers[existingIndex].lastName,
+            userName: user.userName.isNotEmpty ? user.userName : _chatUsers[existingIndex].userName,
+            image: user.image.isNotEmpty ? user.image : _chatUsers[existingIndex].image,
+            lastMessage: user.lastMessage ?? _chatUsers[existingIndex].lastMessage,
+          );
+        } else {
+          _chatUsers.add(user);
+        }
+        _messageServices.requestUserStatus(user.userID);
+      }
       notifyListeners();
     });
   }
 
-  Future<void> joinChat(String receiverID) => _messageServices.joinChat(receiverID);
+  int getTotalUnreadMessages({required String currentUserID}) {
+    int totalUnread = 0;
+    _userMessages.forEach((roomID, messages) {
+      totalUnread += messages
+          .where((msg) => !msg.isRead && msg.senderID != currentUserID && msg.receiverID == currentUserID)
+          .length;
+    });
+    return totalUnread;
+  }
 
-  Future<void> fetchChatUsers() => _messageServices.fetchChatUsers();
+  Future<void> joinChat(String receiverID) async {
+    print('Joining chat with receiverID: $receiverID');
+    await _messageServices.joinChat(receiverID);
+    await _messageServices.requestUserStatus(receiverID);
+  }
+
+  Future<void> fetchChatUsers() {
+    print('Fetching chat users');
+    return _messageServices.fetchChatUsers();
+  }
+
+  Future<void> requestUserStatus(String receiverID) {
+    print('Requesting user status for receiverID: $receiverID');
+    return _messageServices.requestUserStatus(receiverID);
+  }
 
   Future<void> sendMessage(String receiverID, String content, {required List<String> images, required String senderID}) async {
     final roomID = _getRoomID(senderID, receiverID);
     _userTypingStatuses.putIfAbsent(roomID, () => {});
     _userTypingStatuses[roomID]![receiverID] = false;
     notifyListeners();
+    print('Sending message to receiverID: $receiverID');
     return _messageServices.sendMessage(receiverID, content, images: images);
   }
 
-  Future<void> addMessageReaction(String messageID, String reaction) =>
-      _messageServices.addMessageReaction(messageID, reaction);
+  Future<void> addMessageReaction(String messageID, String reaction) {
+    print('Adding message reaction for messageID: $messageID');
+    return _messageServices.addMessageReaction(messageID, reaction);
+  }
 
-  Future<void> removeMessageReaction(String messageID, String reactionID) =>
-      _messageServices.removeMessageReaction(messageID, reactionID);
+  Future<void> removeMessageReaction(String messageID, String reactionID) {
+    print('Removing message reaction for messageID: $messageID');
+    return _messageServices.removeMessageReaction(messageID, reactionID);
+  }
 
-  Future<void> markMessageAsRead(String messageID) =>
-      _messageServices.markMessageAsRead(messageID);
+  Future<void> markMessageAsRead(String messageID) {
+    print('Marking message as read for messageID: $messageID');
+    return _messageServices.markMessageAsRead(messageID);
+  }
 
   Future<void> sendTypingStatus(String receiverID, bool isTyping, {required String senderID}) async {
     final roomID = _getRoomID(senderID, receiverID);
     _userTypingStatuses.putIfAbsent(roomID, () => {});
+    print('Sending typing status: isTyping=$isTyping for receiverID: $receiverID');
     if (isTyping) {
       await _messageServices.startTyping(receiverID);
     } else {
@@ -153,10 +204,9 @@ class MessagesSocketProvider extends ChangeNotifier {
     return 'chat:${ids.join(':')}';
   }
 
-
-
   @override
   void dispose() {
+    print('Disposing MessagesSocketProvider');
     _messagesSubscription?.cancel();
     _errorSubscription?.cancel();
     _successSubscription?.cancel();

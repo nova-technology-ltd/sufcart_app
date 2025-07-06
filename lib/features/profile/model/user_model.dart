@@ -36,6 +36,7 @@ class UserModel {
   final List<FollowModel> followers;
   final List<FollowModel> following;
   final MessagesModel? lastMessage;
+  final String? status; // e.g., 'online', 'offline', 'away'
 
   UserModel({
     required this.id,
@@ -69,6 +70,7 @@ class UserModel {
     required this.followers,
     required this.following,
     this.lastMessage,
+    this.status,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -159,6 +161,7 @@ class UserModel {
       followers: followers,
       following: following,
       lastMessage: lastMessage,
+      status: map['status'],
     );
   }
 
@@ -237,6 +240,7 @@ class UserModel {
     List<FollowModel>? followers,
     List<FollowModel>? following,
     MessagesModel? lastMessage,
+    String? status,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -272,6 +276,7 @@ class UserModel {
       followers: followers ?? this.followers,
       following: following ?? this.following,
       lastMessage: lastMessage ?? this.lastMessage,
+      status: status ?? this.status,
     );
   }
 }

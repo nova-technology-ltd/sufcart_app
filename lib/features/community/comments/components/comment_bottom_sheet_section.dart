@@ -4,6 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:sufcart_app/utilities/constants/app_colors.dart';
+import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 
 import '../../../../../utilities/components/cloudinary_eervices.dart';
 import '../../../../../utilities/components/show_snack_bar.dart';
@@ -218,6 +221,7 @@ class _CommentBottomSheetSectionState extends State<CommentBottomSheetSection> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Material(
@@ -225,8 +229,8 @@ class _CommentBottomSheetSectionState extends State<CommentBottomSheetSection> {
         child: Container(
           height: 500,
           width: MediaQuery.of(context).size.width,
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
           ),
           child: Stack(
@@ -390,7 +394,7 @@ class _CommentBottomSheetSectionState extends State<CommentBottomSheetSection> {
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border(
-          top: BorderSide(color: Colors.grey.withOpacity(0.3), width: 0.5),
+          top: BorderSide(color: Colors.grey.withOpacity(0.1), width: 0.5),
         ),
       ),
       child: Column(

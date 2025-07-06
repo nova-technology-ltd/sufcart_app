@@ -22,7 +22,7 @@ void showSnackBar(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Dialog(
-        backgroundColor: themeProvider.isDarkMode ? Colors.grey[900] : Colors.white,
+        backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),

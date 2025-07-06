@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:sufcart_app/features/community/posts/model/post_model.dart';
 import 'package:sufcart_app/features/community/posts/screen/post_view_screen.dart';
 
@@ -24,7 +25,14 @@ class ProfilePostTabCard extends StatelessWidget {
             color: Colors.grey.withOpacity(0.2),
             borderRadius: BorderRadius.circular(0)
           ),
-          child: Image.network(
+          child: postModel.postImages.isEmpty ? Center(
+            child: Image.asset(
+              AppIcons.koradLogo,
+              color: Colors.grey,
+              width: 18,
+              height: 18,
+            ),
+          ) : Image.network(
             postModel.postImages[0],
             fit: BoxFit.cover,
             loadingBuilder: (

@@ -277,7 +277,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       backgroundColor: isDarkMode ? null : Colors.white,
       appBar: AppBar(
         backgroundColor: isDarkMode ? null : Colors.white,
-        surfaceTintColor: isDarkMode ? Colors.black : Colors.white,
+        surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         leadingWidth: 0,
         automaticallyImplyLeading: false,
         elevation: 3,
@@ -524,7 +524,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.transparent : Colors.white,
+              color: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: isDarkMode ? Colors.transparent : Colors.grey.withOpacity(0.1),

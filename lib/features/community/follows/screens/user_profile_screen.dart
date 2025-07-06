@@ -4,6 +4,7 @@ import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:sufcart_app/features/community/follows/section/profile_post_tab_section.dart';
 import 'package:sufcart_app/features/community/follows/section/profile_repost_section.dart';
+import 'package:sufcart_app/features/community/follows/services/follows_services.dart';
 import 'package:sufcart_app/features/community/posts/model/post_model.dart';
 import 'package:sufcart_app/features/community/posts/service/post_services.dart';
 import 'package:sufcart_app/features/community/repost/model/repost_model.dart';
@@ -13,7 +14,6 @@ import 'package:sufcart_app/utilities/components/app_bar_back_arrow.dart';
 import 'package:sufcart_app/utilities/components/read_more_text.dart';
 import 'package:sufcart_app/utilities/constants/app_colors.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
-
 import '../../../auth/service/auth_service.dart';
 import '../../../profile/model/user_provider.dart';
 import '../../likes/socket/like_socket_provider.dart';
@@ -36,8 +36,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   late TabController _tabController;
   late Future<List<PostModel>> _futurePosts;
   late Future<List<Map<String, dynamic>>> _futureReposts;
+  late Future<Map<String, dynamic>> _futureAnalytics;
   final PostServices _postServices = PostServices();
   final RepostService _repostService = RepostService();
+  final FollowsServices _followsServices = FollowsServices();
 
   Future<void> _toggleFollow(BuildContext context) async {
     final userID = context.read<UserProvider>().userModel.userID;
@@ -45,24 +47,24 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     final followsProvider = context.read<FollowsSocketProvider>();
     final userProvider = context.read<UserProvider>();
     final isFollowing =
-        userProvider.userModel.following.any((f) => f.userID == accountOwnerID) ||
+        userProvider.userModel.following.any(
+          (f) => f.userID == accountOwnerID,
+        ) ||
         followsProvider
             .getFollowing(userID)
             .any((f) => f['userID'] == accountOwnerID);
     final AuthService _authService = AuthService();
 
-    // Store original following list for reversion on error
     final originalFollowing = List<FollowModel>.from(
       userProvider.userModel.following,
     );
 
     if (!isFollowing) {
-      // Optimistic update: Add to UserModel's following list
       final updatedFollowing = List<FollowModel>.from(
         userProvider.userModel.following,
       )..add(
         FollowModel(
-          followID: '', // Placeholder, server provides actual ID
+          followID: '',
           userID: accountOwnerID!,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
@@ -108,6 +110,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     _tabController = TabController(length: 2, vsync: this);
     _futurePosts = _postServices.postsByUser(context, widget.user!.userID);
     _futureReposts = _repostService.repostsByUser(context, widget.user!.userID);
+    _futureAnalytics = _followsServices.userProfileAnalytics(
+      context,
+      widget.user!.userID,
+    ); // Initialize analytics
   }
 
   @override
@@ -135,7 +141,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               actions: [],
               backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
               surfaceTintColor:
-                  themeProvider.isDarkMode ? Colors.black : Colors.white,
+                  themeProvider.isDarkMode
+                      ? Color(AppColors.primaryColorDarkMode)
+                      : Colors.white,
               elevation: 0,
               scrolledUnderElevation: 1,
               centerTitle: true,
@@ -186,9 +194,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           controller: _tabController,
           physics: BouncingScrollPhysics(),
           children: [
-            // Posts tab content
             ProfilePostTabSection(futurePosts: _futurePosts),
-            // Reposts tab content
             ProfileRepostSection(futureReposts: _futureReposts),
           ],
         ),
@@ -220,9 +226,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       ) {
         final isFollowing =
             userFollowing.any((f) => f.userID == accountOwner) ||
-                followsProvider
-                    .getFollowing(userID)
-                    .any((f) => f['userID'] == accountOwner);
+            followsProvider
+                .getFollowing(userID)
+                .any((f) => f['userID'] == accountOwner);
         return Padding(
           padding: const EdgeInsets.only(top: 10.0),
           child: Column(
@@ -240,7 +246,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 1, color: Colors.grey)
+                    border: Border.all(width: 1, color: Colors.grey),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(2.0),
@@ -249,7 +255,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       width: 60,
                       clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Image.network(
                         user!.image,
@@ -285,46 +291,39 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 1.3,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildProfileActivitySummary(
+              FutureBuilder<Map<String, dynamic>>(
+                future: _futureAnalytics,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return _buildProfileActivitySummaryRow(
                       context: context,
-                      data: "${user.followers.length}",
-                      title: 'Followers',
-                    ),
-                    const SizedBox(width: 5),
-                    Container(
-                      height: 30,
-                      width: 1,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.3),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    _buildProfileActivitySummary(
+                      followers: "${user.followers.length}",
+                      likes: "0",
+                      following: '${user.following.length}',
+                      posts: '0',
+                    );
+                  } else if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data!.isEmpty) {
+                    return _buildProfileActivitySummaryRow(
                       context: context,
-                      data: "${user.following.length}",
-                      title: 'Likes',
-                    ),
-                    const SizedBox(width: 5),
-                    Container(
-                      height: 30,
-                      width: 1,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.3),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    _buildProfileActivitySummary(
+                      followers: "${user.followers.length}",
+                      likes: "0",
+                      following: '${user.following.length}',
+                      posts: '0',
+                    );
+                  } else {
+                    final analytics = snapshot.data!;
+                    return _buildProfileActivitySummaryRow(
                       context: context,
-                      data: "${user.following.length}",
-                      title: 'Following',
-                    ),
-                  ],
-                ),
+                      followers: "${user.followers.length}",
+                      likes: "${analytics['totalLikes'] ?? 0}",
+                      following: '${user.following.length}',
+                      posts: '${analytics['totalPosts'] ?? 0}',
+                    );
+                    ;
+                  }
+                },
               ),
               const SizedBox(height: 15),
               Padding(
@@ -338,7 +337,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                         width: MediaQuery.of(context).size.width,
                         clipBehavior: Clip.antiAlias,
                         decoration: BoxDecoration(
-                          color: !isFollowing && accountOwner != userID ? Color(AppColors.primaryColor).withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+                          color:
+                              !isFollowing && accountOwner != userID
+                                  ? Color(
+                                    AppColors.primaryColor,
+                                  ).withOpacity(0.2)
+                                  : Colors.grey.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: MaterialButton(
@@ -347,18 +351,29 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              !isFollowing && accountOwner != userID ? Icon(
-                                Icons.add,
-                                color: Color(AppColors.primaryColor),
-                                size: 15,
-                              ) : const SizedBox.shrink(),
-                              SizedBox(width: !isFollowing && accountOwner != userID ? 5 : 0),
+                              if (!isFollowing && accountOwner != userID)
+                                Icon(
+                                  Icons.add,
+                                  color: Color(AppColors.primaryColor),
+                                  size: 15,
+                                ),
+                              SizedBox(
+                                width:
+                                    !isFollowing && accountOwner != userID
+                                        ? 5
+                                        : 0,
+                              ),
                               Text(
-                                !isFollowing && accountOwner != userID ? "Follow" : "Following",
+                                !isFollowing && accountOwner != userID
+                                    ? "Follow"
+                                    : "Following",
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w400,
-                                  color: !isFollowing && accountOwner != userID ? Color(AppColors.primaryColor) : Colors.grey,
+                                  color:
+                                      !isFollowing && accountOwner != userID
+                                          ? Color(AppColors.primaryColor)
+                                          : Colors.grey,
                                 ),
                               ),
                             ],
@@ -443,12 +458,72 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     );
   }
 
+  Widget _buildProfileActivitySummaryRow({
+    required BuildContext context,
+    required String followers,
+    required String likes,
+    required String following,
+    required String posts,
+  }) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 1.2,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          _buildProfileActivitySummary(
+            context: context,
+            data: followers,
+            title: 'Followers',
+          ),
+          const SizedBox(width: 5),
+          Container(
+            height: 30,
+            width: 1,
+            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3)),
+          ),
+          const SizedBox(width: 5),
+          _buildProfileActivitySummary(
+            context: context,
+            data: likes,
+            title: 'Likes',
+          ),
+          const SizedBox(width: 5),
+          Container(
+            height: 30,
+            width: 1,
+            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3)),
+          ),
+          const SizedBox(width: 5),
+          _buildProfileActivitySummary(
+            context: context,
+            data: following,
+            title: 'following',
+          ),
+          const SizedBox(width: 5),
+          Container(
+            height: 30,
+            width: 1,
+            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3)),
+          ),
+          const SizedBox(width: 5),
+          _buildProfileActivitySummary(
+            context: context,
+            data: posts,
+            title: 'Posts',
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildProfileActivitySummary({
     required BuildContext context,
     required String data,
     required String title,
   }) {
-    String formatNumber(double number) {
+    String formatNumber(String data) {
+      double number = double.tryParse(data) ?? 0;
       if (number >= 1000000000) {
         return '${(number / 1000000000).toStringAsFixed(1)}b';
       } else if (number >= 1000000) {
@@ -466,7 +541,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         child: Column(
           children: [
             Text(
-              formatNumber(double.parse(data)),
+              formatNumber(data),
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(
@@ -503,7 +578,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   ) {
     final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Container(
-      color: isDarkMode ? null : Colors.white,
+      color: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
       child: _tabBar,
     );
   }

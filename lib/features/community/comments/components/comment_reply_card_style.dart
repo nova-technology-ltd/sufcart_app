@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sufcart_app/features/community/comments/components/reply_more_action_bottom_sheet.dart';
 
 import '../../../../../utilities/constants/app_icons.dart';
+import '../../../../utilities/themes/theme_provider.dart';
 import '../../../profile/model/user_model.dart';
 import '../../../profile/model/user_provider.dart';
 import '../model/comment_model.dart';
@@ -65,6 +66,7 @@ class _CommentReplyCardStyleState extends State<CommentReplyCardStyle> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context).userModel;
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -75,7 +77,7 @@ class _CommentReplyCardStyleState extends State<CommentReplyCardStyle> {
             width: 28,
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: Colors.grey.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Image.network(
@@ -100,11 +102,11 @@ class _CommentReplyCardStyleState extends State<CommentReplyCardStyle> {
                 Row(
                   children: [
                     Text(
-                      widget.reply.replyUserDetails['userName']!,
-                      style: const TextStyle(
+                      widget.reply.replyUserDetails['userName'] ?? "${widget.reply.replyUserDetails['firstName']} ${widget.reply.replyUserDetails['lastName']} ${widget.reply.replyUserDetails['otherNames']}",
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: isDarkMode ? null : Colors.black87,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -134,9 +136,9 @@ class _CommentReplyCardStyleState extends State<CommentReplyCardStyle> {
                 const SizedBox(height: 2),
                 Text(
                   widget.reply.replyText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Colors.black87,
+                    color: isDarkMode ? null : Colors.black87,
                   ),
                 ),
                 if (widget.reply.replyImages.isNotEmpty)

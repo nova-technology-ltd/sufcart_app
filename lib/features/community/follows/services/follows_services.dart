@@ -115,4 +115,64 @@ class FollowsServices {
       return [];
     }
   }
+
+  Future<Map<String, dynamic>> userProfileAnalytics(BuildContext context, String userID) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("Authorization");
+
+      final response = await http.get(
+        Uri.parse("$baseUrl/api/v1/org/community/follows/user/$userID/analytics"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      );
+      print(response.body);
+      if (response.statusCode == 200) {
+        // Parse the JSON response into a Map<String, dynamic>
+        final Map<String, dynamic> analyticsData = jsonDecode(response.body);
+
+        // Verify the response structure
+        if (analyticsData['title'] == 'Success' && analyticsData['data'] != null) {
+          return analyticsData['data'] as Map<String, dynamic>;
+        } else {
+          showSnackBar(
+            context: context,
+            message: 'Unexpected response format',
+            title: 'Error',
+          );
+          return {};
+        }
+      } else if (response.statusCode == 401) {
+        showSnackBar(
+          context: context,
+          message: 'You must be logged in to access this resource',
+          title: 'Unauthorized',
+        );
+        return {};
+      } else if (response.statusCode == 404) {
+        showSnackBar(
+          context: context,
+          message: 'No posts found for this user',
+          title: 'Not Found',
+        );
+        return {};
+      } else {
+        showSnackBar(
+          context: context,
+          message: 'Server Error: ${response.statusCode}',
+          title: 'Server Error',
+        );
+        return {};
+      }
+    } catch (e) {
+      showSnackBar(
+        context: context,
+        message: AppStrings.serverErrorMessage,
+        title: 'Server Error',
+      );
+      return {};
+    }
+  }
 }

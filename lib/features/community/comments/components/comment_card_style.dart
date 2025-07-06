@@ -109,7 +109,7 @@ class _CommentCardStyleState extends State<CommentCardStyle> {
                 width: 35,
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Colors.grey.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Image.network(
@@ -134,7 +134,7 @@ class _CommentCardStyleState extends State<CommentCardStyle> {
                     Row(
                       children: [
                         Text(
-                          widget.comment.commentUserDetails['userName'] ?? 'Unknown',
+                          widget.comment.commentUserDetails['userName'] ?? "${ widget.comment.commentUserDetails['firstName']} ${ widget.comment.commentUserDetails['lastName']} ${ widget.comment.commentUserDetails['otherNames']}",
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -195,7 +195,7 @@ class _CommentCardStyleState extends State<CommentCardStyle> {
                                         width: 50,
                                         clipBehavior: Clip.antiAlias,
                                         decoration: BoxDecoration(
-                                          color: Colors.grey[200],
+                                          color: Colors.grey.withOpacity(0.2),
                                           borderRadius: BorderRadius.circular(10),
                                         ),
                                         child: Image.network(

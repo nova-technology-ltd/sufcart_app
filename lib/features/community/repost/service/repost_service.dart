@@ -120,12 +120,6 @@ class RepostService {
         return [];
       }
     } catch (e) {
-      debugPrint('Error fetching reposts: $e');
-      showSnackBar(
-        context: context,
-        message: AppStrings.serverErrorMessage,
-        title: "Server Error",
-      );
       return [];
     }
   }

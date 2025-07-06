@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
@@ -22,11 +23,20 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen> {
   late Future<List<PostModel>> _futurePosts;
   final PostServices _communityServices = PostServices();
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  bool _isSearchVisible = false;
 
   @override
   void initState() {
     _futurePosts = _communityServices.allCommunityPosts(context);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   // Method to refresh posts
@@ -38,21 +48,29 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   // Method to sort posts with weighted randomization
   List<PostModel> _sortPostsWithWeightedRandom(List<PostModel> posts) {
-    // Create a copy of the posts list to avoid modifying the original
     List<PostModel> sortedPosts = List.from(posts);
-    // Sort by createdAt in descending order (newest first)
     sortedPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-    // Ensure at least 70% of the top posts are the newest
     int topNewCount = (sortedPosts.length * 0.7).ceil();
     List<PostModel> topNewPosts = sortedPosts.take(topNewCount).toList();
     List<PostModel> remainingPosts = sortedPosts.skip(topNewCount).toList();
-
-    // Shuffle the remaining posts to introduce randomness
     remainingPosts.shuffle(Random());
-
-    // Combine the top new posts with the shuffled remaining posts
     return [...topNewPosts, ...remainingPosts];
+  }
+
+  // Method to filter posts based on search query
+  List<PostModel> _filterPosts(List<PostModel> posts, String query) {
+    if (query.isEmpty) return posts;
+    return posts.where((post) {
+      // Assuming PostModel has fields like 'title' or 'description'
+      // Modify based on your PostModel structure
+      final userName = post.userDetails?.userName.toLowerCase() ?? '';
+      final firstName = post.userDetails?.firstName.toLowerCase() ?? '';
+      final lastName = post.userDetails?.lastName.toLowerCase() ?? '';
+      final otherNames = post.userDetails?.otherNames.toLowerCase() ?? '';
+      final description = post.postText.toLowerCase() ?? '';
+      final queryLower = query.toLowerCase();
+      return userName.contains(queryLower) || firstName.contains(queryLower) || lastName.contains(queryLower) || description.contains(queryLower) || otherNames.contains(queryLower);
+    }).toList();
   }
 
   @override
@@ -63,7 +81,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       backgroundColor: isDarkMode ? null : Colors.white,
       appBar: AppBar(
         backgroundColor: isDarkMode ? null : Colors.white,
-        surfaceTintColor: isDarkMode ? Colors.black : Colors.white,
+        surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         automaticallyImplyLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,8 +108,19 @@ class _CommunityScreenState extends State<CommunityScreen> {
             icon: Icon(IconlyLight.image, color: Colors.grey),
           ),
           IconButton(
-            onPressed: () {},
-            icon: Icon(IconlyLight.search, color: Colors.grey),
+            onPressed: () {
+              setState(() {
+                _isSearchVisible = !_isSearchVisible;
+                if (!_isSearchVisible) {
+                  _searchController.clear();
+                  _searchQuery = '';
+                }
+              });
+            },
+            icon: Icon(
+              _isSearchVisible ? IconlyLight.close_square : IconlyLight.search,
+              color: Colors.grey,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 5.0, right: 10),
@@ -110,7 +139,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   width: 35,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: Colors.grey.withOpacity(0.2),
                     shape: BoxShape.circle,
                   ),
                   child: Image.network(
@@ -136,35 +165,120 @@ class _CommunityScreenState extends State<CommunityScreen> {
         onRefresh: _refreshPosts,
         backgroundColor: Colors.white,
         color: Color(AppColors.primaryColor),
-        child: FutureBuilder<List<PostModel>>(
-          future: _futurePosts,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return PostShimmerLoader();
-            } else if (snapshot.hasError ||
-                !snapshot.hasData ||
-                snapshot.data!.isEmpty) {
-              return Center(
-                child: Text(
-                  "No posts available",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                  ),
+        child: Column(
+          children: [
+            if (_isSearchVisible)
+              ZoomIn(
+                duration: Duration(milliseconds: 500),
+                child: Column(
+                  children: [
+                    Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    child: Container(
+                      height: 43,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(right: 7.0),
+                              child: Icon(
+                                IconlyLight.search,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                controller:
+                                _searchController,
+                                cursorColor: Colors.grey,
+                                cursorHeight: 18,
+                                style: const TextStyle(fontSize: 14),
+                                decoration: const InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                  hintText: "search community...",
+                                  hintStyle: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey,
+                                  ),
+                                  filled: false,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _searchQuery = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                                ),
+                    const SizedBox(height: 10,),
+                  ],
                 ),
-              );
-            }
-            final posts = snapshot.data!;
-            // Apply weighted randomization to posts
-            final displayedPosts = _sortPostsWithWeightedRandom(posts);
-            return SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: Column(
-                children:
-                displayedPosts.map((post) => PostCardStyle(post: post)).toList(),
               ),
-            );
-          },
+            Expanded(
+              child: FutureBuilder<List<PostModel>>(
+                future: _futurePosts,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return PostShimmerLoader();
+                  } else if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No posts available",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        ),
+                      ),
+                    );
+                  }
+                  final posts = snapshot.data!;
+                  // Apply weighted randomization and then filter by search query
+                  final sortedPosts = _sortPostsWithWeightedRandom(posts);
+                  final displayedPosts = _filterPosts(sortedPosts, _searchQuery);
+                  return SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    child: Column(
+                      children: displayedPosts
+                          .map((post) => PostCardStyle(post: post))
+                          .toList(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

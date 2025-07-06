@@ -413,6 +413,7 @@
 //   }
 // }
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
@@ -510,119 +511,145 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _showTime = !_showTime;
-          });
-        },
-        onLongPress: () {
-          _showReactionMenu(context);
-        },
-        onHorizontalDragUpdate: _handleSwipe,
-        onHorizontalDragEnd: _handleDragEnd,
-        child: AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, child) {
-            final offset = _isSwiping ? _dragOffset : _slideAnimation.value;
-            return Transform.translate(
-              offset: Offset(offset, 0),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                        bottom: widget.isLastInGroup ? 2.5 : 1.5,
-                        top: widget.isFirstInGroup ? 2.5 : 1.5,
-                      ),
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.75,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            (widget.images != null && widget.images.isNotEmpty)
-                                ? Colors.grey.withOpacity(0.0)
-                                : Color(AppColors.primaryColor),
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(20),
-                          topRight:
-                              widget.isFirstInGroup
-                                  ? const Radius.circular(20)
-                                  : const Radius.circular(4),
-                          bottomLeft: const Radius.circular(20),
-                          bottomRight:
-                              widget.isLastInGroup
-                                  ? const Radius.circular(20)
-                                  : const Radius.circular(4),
-                        ),
-                      ),
-                      child: IntrinsicWidth(
-                        child: Container(
-                          padding:
-                              (widget.images != null &&
-                                      widget.images.isNotEmpty)
-                                  ? null
-                                  : const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 14,
-                                  ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (widget.message.isNotEmpty)
-                                Text(
-                                  widget.message,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              if (widget.images != null &&
-                                  widget.images.isNotEmpty)
-                                _buildImageWidget(widget.images),
-                              if (widget.reactions != null &&
-                                  widget.reactions!.isNotEmpty)
-                                _buildReactionsWidget(widget.reactions!),
-                            ],
+      child: CupertinoContextMenu(
+        actions: [
+          CupertinoContextMenuAction(
+            trailingIcon: CupertinoIcons.reply,
+            onPressed: (){},
+            child: const Text("Reply"),
+          ),
+          CupertinoContextMenuAction(
+            trailingIcon: CupertinoIcons.delete,
+            onPressed: (){},
+            child: const Text("Delete"),
+          ),
+          CupertinoContextMenuAction(
+            trailingIcon: CupertinoIcons.heart_fill,
+            onPressed: (){
+              _showReactionMenu(context);
+            },
+            child: const Text("React"),
+          ),
+          CupertinoContextMenuAction(
+            trailingIcon: CupertinoIcons.share,
+            onPressed: (){},
+            child: const Text("Share"),
+          ),
+        ],
+        child: Material(
+          color: Colors.transparent,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _showTime = !_showTime;
+              });
+            },
+            onHorizontalDragUpdate: _handleSwipe,
+            onHorizontalDragEnd: _handleDragEnd,
+            child: AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                final offset = _isSwiping ? _dragOffset : _slideAnimation.value;
+                return Transform.translate(
+                  offset: Offset(offset, 0),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(
+                            bottom: widget.isLastInGroup ? 2.5 : 1.5,
+                            top: widget.isFirstInGroup ? 2.5 : 1.5,
                           ),
-                        ),
-                      ),
-                    ),
-                    if (_showTime)
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: 0,
-                          right: 5,
-                          bottom: _showTime ? 5 : 0,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              IconlyLight.time_circle,
-                              size: 12,
-                              color: Colors.grey,
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.75,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                (widget.images != null && widget.images.isNotEmpty)
+                                    ? Colors.grey.withOpacity(0.0)
+                                    : Color(AppColors.primaryColor),
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(20),
+                              topRight:
+                                  widget.isFirstInGroup
+                                      ? const Radius.circular(20)
+                                      : const Radius.circular(4),
+                              bottomLeft: const Radius.circular(20),
+                              bottomRight:
+                                  widget.isLastInGroup
+                                      ? const Radius.circular(20)
+                                      : const Radius.circular(4),
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              DateFormat('hh:mm a').format(widget.sentTime),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+                          ),
+                          child: IntrinsicWidth(
+                            child: Container(
+                              padding:
+                                  (widget.images != null &&
+                                          widget.images.isNotEmpty)
+                                      ? null
+                                      : const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 14,
+                                      ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  if (widget.message.isNotEmpty)
+                                    Text(
+                                      widget.message,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  if (widget.images != null &&
+                                      widget.images.isNotEmpty)
+                                    _buildImageWidget(widget.images),
+                                  if (widget.reactions != null &&
+                                      widget.reactions!.isNotEmpty)
+                                    _buildReactionsWidget(widget.reactions!),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-              ),
-            );
-          },
+                        if (_showTime)
+                          Padding(
+                            padding: EdgeInsets.only(
+                              top: 0,
+                              right: 5,
+                              bottom: _showTime ? 5 : 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  IconlyLight.time_circle,
+                                  size: 12,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  DateFormat('hh:mm a').format(widget.sentTime),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

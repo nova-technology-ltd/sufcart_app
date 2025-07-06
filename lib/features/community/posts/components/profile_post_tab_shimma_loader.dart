@@ -38,7 +38,7 @@ class ShimmerBox extends StatelessWidget {
     return Container(
       height: 100,
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.grey.withOpacity(0.2),
       ),
       child: ShaderMask(
         shaderCallback: (bounds) {
@@ -46,9 +46,9 @@ class ShimmerBox extends StatelessWidget {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: [
-              Colors.grey[300]!,
-              Colors.grey[100]!,
-              Colors.grey[300]!,
+              Colors.grey.withOpacity(0.3)!,
+              Colors.grey.withOpacity(0.1)!,
+              Colors.grey.withOpacity(0.3),
             ],
             stops: const [0.0, 0.5, 1.0],
             transform: _SlideGradientTransform(animation.value),
@@ -57,7 +57,7 @@ class ShimmerBox extends StatelessWidget {
         blendMode: BlendMode.srcATop,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: Colors.grey.withOpacity(0.2),
           ),
         ),
       ),
