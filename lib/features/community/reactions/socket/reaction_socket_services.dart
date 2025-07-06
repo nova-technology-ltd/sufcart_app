@@ -8,16 +8,21 @@ import 'package:flutter/material.dart';
 
 class ReactionSocketServices {
   final SocketConfigProvider _socketConfigProvider;
-  final StreamController<Map<String, dynamic>> _reactionController = StreamController<Map<String, dynamic>>.broadcast();
-  final StreamController<String> _errorController = StreamController<String>.broadcast();
-  final StreamController<Map<String, dynamic>> _successController = StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _reactionController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<String> _errorController =
+      StreamController<String>.broadcast();
+  final StreamController<Map<String, dynamic>> _successController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<Map<String, dynamic>> get reactionStream => _reactionController.stream;
+
   Stream<String> get errorStream => _errorController.stream;
+
   Stream<Map<String, dynamic>> get successStream => _successController.stream;
 
   ReactionSocketServices({required SocketConfigProvider socketConfigProvider})
-      : _socketConfigProvider = socketConfigProvider {
+    : _socketConfigProvider = socketConfigProvider {
     _init();
   }
 
@@ -42,7 +47,10 @@ class ReactionSocketServices {
 
   Future<void> _ensureConnected() async {
     if (!_socketConfigProvider.isConnected) {
-      await _socketConfigProvider.connectionStatus.firstWhere((status) => status == true, orElse: () => false);
+      await _socketConfigProvider.connectionStatus.firstWhere(
+        (status) => status == true,
+        orElse: () => false,
+      );
       if (!_socketConfigProvider.isConnected) {
         throw Exception('Socket failed to connect');
       }
@@ -70,10 +78,13 @@ class ReactionSocketServices {
     }
   }
 
-  Future<void> removeReaction(String postID) async {
+  Future<void> removeReaction(String postID, String reactionID) async {
     try {
       await _ensureConnected();
-      _socketConfigProvider.emit('removeReaction', {'postID': postID});
+      _socketConfigProvider.emit('removeReaction', {
+        'postID': postID,
+        'reactionID': reactionID,
+      });
     } catch (e) {
       _errorController.add('Socket is not connected');
     }

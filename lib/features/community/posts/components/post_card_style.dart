@@ -487,6 +487,12 @@ class _PostCardStyleState extends State<PostCardStyle> {
                                     return ReactionCardStyle(
                                       reaction: emoji,
                                       count: "$count",
+                                      onTap: (){
+                                        context.read<ReactionSocketProvider>().removeReaction(
+                                          widget.post.postID,
+                                          userReaction?['reactionID'] ?? '',
+                                        );
+                                      },
                                     );
                                   }).toList(),
                             ),

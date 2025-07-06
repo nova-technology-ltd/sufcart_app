@@ -1,25 +1,21 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
+import '../provider/messages_socket_provider.dart'; // Adjust the import path
 
-class ActiveUsersSection extends StatefulWidget {
-  const ActiveUsersSection({super.key});
+class ActiveUsersSection extends StatelessWidget {
+  final MessagesSocketProvider messagesSocketProvider;
 
-  @override
-  State<ActiveUsersSection> createState() => _ActiveUsersSectionState();
-}
+  const ActiveUsersSection({super.key, required this.messagesSocketProvider});
 
-class _ActiveUsersSectionState extends State<ActiveUsersSection> {
-  final demoUsers = [
-    "#miami#brickell#brickellmiami.jpeg",
-    "#mall #shopping #fyp.jpeg",
-    "70891f69-4ac3-49d4-9a16-e3061f6dba20.jpeg",
-    "c7008c73-b7ab-4e62-9b29-eddf21be238a.jpeg",
-    "custom_jewelry_banner_image.jpg",
-  ];
   @override
   Widget build(BuildContext context) {
-    return Column(
+    // Filter users who are online
+    final onlineUsers = messagesSocketProvider.chatUsers
+        .where((user) => user.status == 'online')
+        .toList();
+
+    return onlineUsers.isEmpty ? const SizedBox.shrink() : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
@@ -27,60 +23,83 @@ class _ActiveUsersSectionState extends State<ActiveUsersSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Active Connections",
                 style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               Text(
-                "83 of your connections are active",
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey
+                "${onlineUsers.length} of your connections are active",
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
                 ),
-              )
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 10,),
+        const SizedBox(height: 10),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Row(
-            children: [
-              for (int i = 0; i < 18; i++)
-                Padding(
-                  padding: EdgeInsets.only(left: i == 0 ? 10 : 3.0, right: i == 9 ? 10 : 3),
-                  child: Container(
-                    height: 60,
-                    width: 60,
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      shape: BoxShape.circle,
-                      border: Border.all(width: 1.8, color: Colors.green)
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(2.5),
-                        child: Container(
-                          height: 60,
-                          width: 60,
-                          clipBehavior: Clip.antiAlias,
-                          decoration: BoxDecoration(
-                              color: Colors.grey,
-                              shape: BoxShape.circle
-                          ),
-                          child: Image.asset("images/${demoUsers[Random().nextInt(demoUsers.length)]}", fit: BoxFit.cover,),
+            children: onlineUsers.isEmpty
+                ? [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  "No active connections",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ]
+                : onlineUsers.asMap().entries.map((entry) {
+              final index = entry.key;
+              final user = entry.value;
+              return Padding(
+                padding: EdgeInsets.only(
+                  left: index == 0 ? 10 : 3.0,
+                  right: index == onlineUsers.length - 1 ? 10 : 3,
+                ),
+                child: Container(
+                  height: 60,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.all(width: 1.8, color: Colors.green),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(2.5),
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          shape: BoxShape.circle,
                         ),
+                        child: Image.network(
+                          user.image,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Icon(IconlyBold.profile, size: 20, color: Colors.grey,),
+                        )
                       ),
                     ),
                   ),
-                )
-            ],
+                ),
+              );
+            }).toList(),
           ),
         ),
+        // const SizedBox(height: 10),
       ],
     );
   }

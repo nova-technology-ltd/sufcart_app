@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../../../../utilities/themes/theme_provider.dart';
 import '../../../utilities/constants/app_colors.dart';
 import '../../profile/model/user_provider.dart';
 import '../../profile/screens/profile_screen.dart';
+import '../messages/provider/messages_socket_provider.dart';
 import '../posts/components/post_card_style.dart';
 import '../posts/helper/post_shimmer_loader.dart';
 import '../posts/model/post_model.dart';
@@ -25,11 +27,22 @@ class _CommunityScreenState extends State<CommunityScreen> {
   final PostServices _communityServices = PostServices();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  bool _isOffline = false;
   bool _isSearchVisible = false;
+  Timer? _statusPollingTimer;
 
   @override
   void initState() {
     _futurePosts = _communityServices.allCommunityPosts(context);
+    _statusPollingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (!_isOffline && mounted) {
+        print('Polling user statuses');
+        final provider = Provider.of<MessagesSocketProvider>(context, listen: false);
+        for (var user in provider.chatUsers) {
+          provider.requestUserStatus(user.userID);
+        }
+      }
+    });
     super.initState();
   }
 

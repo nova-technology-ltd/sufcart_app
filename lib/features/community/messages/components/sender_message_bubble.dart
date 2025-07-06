@@ -608,9 +608,6 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
                                   if (widget.images != null &&
                                       widget.images.isNotEmpty)
                                     _buildImageWidget(widget.images),
-                                  if (widget.reactions != null &&
-                                      widget.reactions!.isNotEmpty)
-                                    _buildReactionsWidget(widget.reactions!),
                                 ],
                               ),
                             ),
@@ -627,6 +624,9 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                if (widget.reactions != null &&
+                                    widget.reactions!.isNotEmpty)
+                                  _buildReactionsWidget(widget.reactions!),
                                 Icon(
                                   IconlyLight.time_circle,
                                   size: 12,
@@ -675,7 +675,7 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
 
   Widget _buildReactionsWidget(List<dynamic> reactions) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(top: 0),
       child: Wrap(
         spacing: 6,
         runSpacing: 4,
@@ -693,8 +693,7 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        widget.isDarkMode ? Colors.grey.shade800 : Colors.white,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(

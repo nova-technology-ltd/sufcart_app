@@ -24,6 +24,7 @@ class _TalksScreenState extends State<TalksScreen> {
   bool _isOffline = false;
   bool _isShowingConnected = false;
   List<UserModel> _cachedChatUsers = [];
+  List<UserModel> _filteredChatUsers = [];
   Timer? _statusPollingTimer;
 
   @override
@@ -34,7 +35,6 @@ class _TalksScreenState extends State<TalksScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshChatUsers();
     });
-    // Periodic polling for user statuses
     _statusPollingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (!_isOffline && mounted) {
         print('Polling user statuses');
@@ -43,6 +43,10 @@ class _TalksScreenState extends State<TalksScreen> {
           provider.requestUserStatus(user.userID);
         }
       }
+    });
+    // Listen to search input changes
+    _searchConversationsController.addListener(() {
+      _filterChatUsers(_searchConversationsController.text);
     });
   }
 
@@ -54,6 +58,7 @@ class _TalksScreenState extends State<TalksScreen> {
         final List<dynamic> jsonData = jsonDecode(cachedData);
         setState(() {
           _cachedChatUsers = jsonData.map((json) => UserModel.fromJson(json)).toList();
+          _filteredChatUsers = _cachedChatUsers;
           print('Loaded cached chat users: ${_cachedChatUsers.map((u) => u.userID).toList()}');
         });
       }
@@ -67,10 +72,37 @@ class _TalksScreenState extends State<TalksScreen> {
       final prefs = await SharedPreferences.getInstance();
       final jsonData = chatUsers.map((user) => user.toJson()).toList();
       await prefs.setString('chat_users_cache', jsonEncode(jsonData));
+      setState(() {
+        _cachedChatUsers = chatUsers;
+        _filteredChatUsers = chatUsers; // Reset filtered list when caching
+      });
       print('Cached chat users: ${chatUsers.map((u) => u.userID).toList()}');
     } catch (e) {
       print('Error caching chat users: $e');
     }
+  }
+
+  void _filterChatUsers(String query) {
+    final provider = Provider.of<MessagesSocketProvider>(context, listen: false);
+    final chatUsers = provider.chatUsers.isNotEmpty ? provider.chatUsers : _cachedChatUsers;
+    if (query.isEmpty) {
+      setState(() {
+        _filteredChatUsers = chatUsers;
+      });
+    } else {
+      setState(() {
+        _filteredChatUsers = chatUsers.where((user) {
+          final queryLower = query.toLowerCase();
+          return (user.userName.toLowerCase().contains(queryLower)) ||
+              (user.firstName.toLowerCase().contains(queryLower)) ||
+              (user.lastName.toLowerCase().contains(queryLower)) ||
+              (user.otherNames.toLowerCase().contains(queryLower)) ||
+              (user.userID.toLowerCase().contains(queryLower)) ||
+              (user.lastMessage?.content?.toLowerCase().contains(queryLower) ?? false);
+        }).toList();
+      });
+    }
+    print('Filtered chat users: ${_filteredChatUsers.map((u) => u.userID).toList()}');
   }
 
   Future<void> _initConnectivity() async {
@@ -116,7 +148,6 @@ class _TalksScreenState extends State<TalksScreen> {
         await provider.fetchChatUsers();
         if (provider.chatUsers.isNotEmpty) {
           await _cacheChatUsers(provider.chatUsers);
-          // Request status for all users to ensure real-time updates
           for (var user in provider.chatUsers) {
             provider.requestUserStatus(user.userID);
           }
@@ -182,11 +213,7 @@ class _TalksScreenState extends State<TalksScreen> {
             surfaceTintColor: isDarkMode ? Colors.black : Colors.white,
             automaticallyImplyLeading: false,
           ),
-          body: errorMessage != null
-              ? Center(child: Text('Error: $errorMessage'))
-              : chatUsers.isEmpty
-              ? const Center(child: Text('No conversations yet'))
-              : SingleChildScrollView(
+          body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,24 +245,30 @@ class _TalksScreenState extends State<TalksScreen> {
                               cursorColor: Colors.grey,
                               cursorHeight: 18,
                               style: const TextStyle(fontSize: 14),
-                              decoration: const InputDecoration(
-                                enabledBorder: OutlineInputBorder(
+                              decoration: InputDecoration(
+                                enabledBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.transparent),
                                 ),
-                                border: OutlineInputBorder(
+                                border: const OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.transparent),
                                 ),
-                                focusedBorder: OutlineInputBorder(
+                                focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.transparent),
                                 ),
-                                hintText: "search conversations...",
-                                hintStyle: TextStyle(fontSize: 13, color: Colors.grey),
+                                hintText: "Search conversations...",
+                                hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
                                 filled: false,
                                 contentPadding: EdgeInsets.zero,
+                                suffixIcon: _searchConversationsController.text.isNotEmpty
+                                    ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 20, color: Colors.grey),
+                                  onPressed: () {
+                                    _searchConversationsController.clear();
+                                    _filterChatUsers('');
+                                  },
+                                )
+                                    : null,
                               ),
-                              onChanged: (value) {
-                                // Implement search filtering if needed
-                              },
                             ),
                           ),
                         ],
@@ -243,31 +276,43 @@ class _TalksScreenState extends State<TalksScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                ActiveUsersSection(),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Talks",
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                _filteredChatUsers.isEmpty && _searchConversationsController.text.isNotEmpty
+                    ? const Center(child: Text('No users found'))
+                    : _filteredChatUsers.isEmpty
+                    ? const Center(child: Text('No conversations yet'))
+                    : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Consumer<MessagesSocketProvider>(
+                      builder: (context, provider, child) {
+                        return ActiveUsersSection(messagesSocketProvider: provider);
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Talks",
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            "You’ve had ${_filteredChatUsers.length} talks so far",
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
                       ),
-                      Text(
-                        "You’ve had ${chatUsers.length} talks so far",
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 5),
+                    for (final user in _filteredChatUsers)
+                      MessagesCardStyle(
+                        user: user,
+                        roomID: _getRoomID(sender.userID, user.userID),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                for (final user in chatUsers)
-                  MessagesCardStyle(
-                    user: user,
-                    roomID: _getRoomID(sender.userID, user.userID),
-                  ),
+                  ],
+                )
               ],
             ),
           ),

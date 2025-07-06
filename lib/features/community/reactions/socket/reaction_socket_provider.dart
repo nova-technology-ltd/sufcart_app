@@ -42,7 +42,7 @@ class ReactionSocketProvider extends ChangeNotifier {
 
   Future<void> joinPost(String postID) => _reactionServices.joinPost(postID);
   Future<void> addReaction(String postID, String reaction) => _reactionServices.addReaction(postID, reaction);
-  Future<void> removeReaction(String postID, String likeID) => _reactionServices.removeReaction(postID);
+  Future<void> removeReaction(String postID, String reactionID) => _reactionServices.removeReaction(postID, reactionID);
 
   @override
   void dispose() {
