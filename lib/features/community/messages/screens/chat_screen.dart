@@ -273,7 +273,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
             replyToContent: _replyToContent,
             onPickImages: _pickImages,
             onSnapPicture: _snapPicture,
-            onSendMessage: _messageController.text.trim().isNotEmpty ? _sendMessage : (){},
+            onSendMessage: _sendMessage,
             onSendImage: _sendImage,
             onTextChanged: _onTextChanged,
           ),
