@@ -75,20 +75,9 @@ class RepostService {
         final List<dynamic> postsData = jsonResponse['data'] as List<dynamic>;
         return postsData.map((postJson) => PostModel.fromMap(postJson as Map<String, dynamic>)).toList();
       } else {
-        showSnackBar(
-          context: context,
-          message: AppStrings.serverErrorMessage,
-          title: "Server Error",
-        );
         return [];
       }
     } catch (e) {
-      print(e);
-      showSnackBar(
-        context: context,
-        message: AppStrings.serverErrorMessage,
-        title: "Server Error",
-      );
       return [];
     }
   }

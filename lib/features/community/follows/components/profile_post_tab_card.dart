@@ -7,7 +7,8 @@ import '../../../../utilities/constants/app_icons.dart';
 
 class ProfilePostTabCard extends StatelessWidget {
   final PostModel postModel;
-  const ProfilePostTabCard({super.key, required this.postModel});
+  final VoidCallback? onLongPress;
+  const ProfilePostTabCard({super.key, required this.postModel, this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,7 @@ class ProfilePostTabCard extends StatelessWidget {
         onTap: (){
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostViewScreen(postModel: postModel)));
         },
+        onLongPress: onLongPress,
         child: Container(
           height: 100,
           width: 100,

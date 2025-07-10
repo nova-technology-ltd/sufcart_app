@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sufcart_app/features/community/messages/components/messages_card_style.dart';
+import 'package:sufcart_app/features/community/messages/screens/my_connections_screen.dart';
 import 'package:sufcart_app/features/community/messages/sections/active_users_section.dart';
 import 'package:sufcart_app/features/profile/model/user_model.dart';
+import 'package:sufcart_app/utilities/components/custom_floating_action_button.dart';
+import 'package:sufcart_app/utilities/constants/app_colors.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
 
@@ -317,6 +321,9 @@ class _TalksScreenState extends State<TalksScreen> {
               ],
             ),
           ),
+          floatingActionButton: CustomFloatingActionButton(onTap: (){
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyConnectionsScreen()));
+          }, icon: Icon(IconlyLight.add_user, size: 20, color: Colors.white,),),
         );
       },
     );

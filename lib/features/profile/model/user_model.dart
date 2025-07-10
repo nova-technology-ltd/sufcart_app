@@ -19,6 +19,7 @@ class UserModel {
   final String password;
   final int accountPIN;
   final String token;
+  final String bio;
   final bool isVendor;
   final bool isEmailVerified;
   final List<dynamic> connectionRequest;
@@ -49,6 +50,7 @@ class UserModel {
     required this.phoneNumber,
     required this.gender,
     required this.dob,
+    required this.bio,
     required this.email,
     required this.password,
     required this.accountPIN,
@@ -140,6 +142,7 @@ class UserModel {
       phoneNumber: map['phoneNumber']?.toString() ?? '',
       gender: map['gender']?.toString() ?? '',
       dob: map['dob']?.toString() ?? '',
+      bio: map['bio']?.toString() ?? '',
       email: map['email']?.toString() ?? '',
       password: map['password']?.toString() ?? '',
       accountPIN: map['accountPIN'] is int ? map['accountPIN'] : 0,
@@ -177,6 +180,7 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'gender': gender,
       'dob': dob,
+      'bio': bio,
       'email': email,
       'password': password,
       'accountPIN': accountPIN,
@@ -217,6 +221,7 @@ class UserModel {
     String? phoneNumber,
     String? gender,
     String? dob,
+    String? bio,
     String? email,
     String? password,
     int? accountPIN,
@@ -253,6 +258,7 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       gender: gender ?? this.gender,
       dob: dob ?? this.dob,
+      bio: bio ?? this.bio,
       email: email ?? this.email,
       password: password ?? this.password,
       accountPIN: accountPIN ?? this.accountPIN,

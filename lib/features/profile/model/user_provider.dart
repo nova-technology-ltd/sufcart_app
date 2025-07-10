@@ -15,6 +15,7 @@ class UserProvider extends ChangeNotifier {
     phoneNumber: '',
     gender: '',
     dob: '',
+    bio: '',
     email: '',
     password: '',
     accountPIN: 0,

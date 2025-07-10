@@ -46,7 +46,7 @@ class _ProfileRepostSectionState extends State<ProfileRepostSection>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return ProfilePostTabShimmaLoader(animation: _animation);
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return Center(child: Text('No posts available'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('No posts available'));
         }

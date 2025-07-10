@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/features/community/follows/screens/my_social_profile_screen.dart';
 import '../../../../utilities/themes/theme_provider.dart';
 import '../../../utilities/constants/app_colors.dart';
 import '../../profile/model/user_provider.dart';
@@ -141,7 +142,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
+                    builder: (context) => MySocialProfileScreen(user: user,),
                   ),
                 );
               },

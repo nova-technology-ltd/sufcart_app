@@ -11,7 +11,7 @@ import '../../../profile/model/user_model.dart';
 class FollowsServices {
   final baseUrl = AppStrings.serverUrl;
   
-  Future<void> getFollowers(BuildContext context, String userID) async {
+  Future<List<UserModel>> getFollowers(BuildContext context, String userID) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("Authorization");
@@ -19,12 +19,36 @@ class FollowsServices {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token"
       });
+      final responseData = jsonDecode(response.body);
+      final List<dynamic> followersData = responseData['data'];
+      final List<UserModel> followers = followersData.map((data) => UserModel.fromMap(data)).toList();
+      return followers;
     } catch (e) {
       showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
     }
+    return [];
   }
 
-  Future<void> getFollowing(BuildContext context, String userID) async {
+  Future<List<UserModel>> getConnections(BuildContext context) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("Authorization");
+      final response = await http.get(Uri.parse("$baseUrl/api/v1/org/community/follows/user/connections"), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      });
+      print(response.body);
+      final responseData = jsonDecode(response.body);
+      final List<dynamic> followingsData = responseData['data'];
+      final List<UserModel> followings = followingsData.map((data) => UserModel.fromMap(data)).toList();
+      return followings;
+    } catch (e) {
+      showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
+    }
+    return[];
+  }
+
+  Future<List<UserModel>> getFollowing(BuildContext context, String userID) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("Authorization");
@@ -32,9 +56,15 @@ class FollowsServices {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token"
       });
+      print(response.body);
+      final responseData = jsonDecode(response.body);
+      final List<dynamic> followingsData = responseData['data'];
+      final List<UserModel> followings = followingsData.map((data) => UserModel.fromMap(data)).toList();
+      return followings;
     } catch (e) {
       showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
     }
+    return[];
   }
 
   Future<List<UserModel>> getAllUsers(BuildContext context) async {

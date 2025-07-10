@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/features/community/follows/screens/user_followers_and_followings_screen.dart';
 import 'package:sufcart_app/features/community/follows/section/profile_post_tab_section.dart';
 import 'package:sufcart_app/features/community/follows/section/profile_repost_section.dart';
 import 'package:sufcart_app/features/community/follows/services/follows_services.dart';
@@ -97,11 +98,95 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         userProvider.updateUser(
           userProvider.userModel.copyWith(following: originalFollowing),
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to unfollow: ${e.toString()}')),
-        );
       }
     }
+  }
+
+  String _getFollowButtonText(
+    UserModel currentUser,
+    UserModel displayedUser,
+    FollowsSocketProvider followsProvider,
+  ) {
+    final currentUserId = currentUser.userID;
+    final displayedUserId = displayedUser.userID.toString();
+
+    if (currentUserId == displayedUserId) {
+      return ""; // Don't show button for self
+    }
+
+    final isCurrentFollowing =
+        currentUser.following.any((f) => f.userID == displayedUserId) ||
+        followsProvider
+            .getFollowing(currentUserId)
+            .any((f) => f['userID'] == displayedUserId);
+
+    final isDisplayedFollowing =
+        displayedUser.following.any((f) => f.userID == currentUserId) ||
+        followsProvider
+            .getFollowing(displayedUserId)
+            .any((f) => f['userID'] == currentUserId);
+
+    if (isCurrentFollowing && isDisplayedFollowing) {
+      return "Connected";
+    } else if (!isCurrentFollowing && isDisplayedFollowing) {
+      return "Follow back";
+    } else if (isCurrentFollowing && !isDisplayedFollowing) {
+      return "Following";
+    } else {
+      return "Follow";
+    }
+  }
+
+  Color _getFollowButtonTextColor(
+    UserModel currentUser,
+    UserModel displayedUser,
+    FollowsSocketProvider followsProvider,
+  ) {
+    final currentUserId = currentUser.userID;
+    final displayedUserId = displayedUser.userID.toString();
+
+    if (currentUserId == displayedUserId) {
+      return Colors.transparent;
+    }
+
+    final buttonText = _getFollowButtonText(
+      currentUser,
+      displayedUser,
+      followsProvider,
+    );
+
+    switch (buttonText) {
+      case "Connected":
+        return Colors.green;
+      case "Follow back":
+        return Color(AppColors.primaryColor);
+      case "Following":
+        return Colors.grey;
+      case "Follow":
+        return Color(AppColors.primaryColor);
+      default:
+        return Colors.transparent;
+    }
+  }
+
+  bool _shouldShowFollowIcon(
+    UserModel currentUser,
+    UserModel displayedUser,
+    FollowsSocketProvider followsProvider,
+  ) {
+    final currentUserId = currentUser.userID;
+    final displayedUserId = displayedUser.userID.toString();
+
+    if (currentUserId == displayedUserId) {
+      return false;
+    }
+
+    final buttonText = _getFollowButtonText(
+      currentUser,
+      displayedUser,
+      followsProvider,
+    );
+    return buttonText == "Follow" || buttonText == "Follow back";
   }
 
   @override
@@ -113,7 +198,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     _futureAnalytics = _followsServices.userProfileAnalytics(
       context,
       widget.user!.userID,
-    ); // Initialize analytics
+    );
   }
 
   @override
@@ -125,6 +210,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final currentUser = Provider.of<UserProvider>(context).userModel;
+    final displayedUser = widget.user!;
+
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
       body: NestedScrollView(
@@ -194,7 +282,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           controller: _tabController,
           physics: BouncingScrollPhysics(),
           children: [
-            ProfilePostTabSection(futurePosts: _futurePosts),
+            ProfilePostTabSection(futurePosts: _futurePosts, onDeletePost: (PostModel ) {  },),
             ProfileRepostSection(futureReposts: _futureReposts),
           ],
         ),
@@ -207,10 +295,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     required UserModel? user,
   }) {
     final fullName = "${user?.firstName} ${user?.lastName} ${user?.otherNames}";
-    final currentUserID = Provider.of<UserProvider>(context).userModel;
-    final userID = context.read<UserProvider>().userModel.userID;
-    final accountOwner = widget.user?.userID.toString();
-    final userFollowing = context.read<UserProvider>().userModel.following;
+    final currentUser = Provider.of<UserProvider>(context).userModel;
+    final displayedUser = widget.user!;
 
     return Consumer3<
       LikeSocketProvider,
@@ -224,11 +310,22 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         followsProvider,
         child,
       ) {
-        final isFollowing =
-            userFollowing.any((f) => f.userID == accountOwner) ||
-            followsProvider
-                .getFollowing(userID)
-                .any((f) => f['userID'] == accountOwner);
+        final buttonText = _getFollowButtonText(
+          currentUser,
+          displayedUser,
+          followsProvider,
+        );
+        final textColor = _getFollowButtonTextColor(
+          currentUser,
+          displayedUser,
+          followsProvider,
+        );
+        final showIcon = _shouldShowFollowIcon(
+          currentUser,
+          displayedUser,
+          followsProvider,
+        );
+
         return Padding(
           padding: const EdgeInsets.only(top: 10.0),
           child: Column(
@@ -300,7 +397,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       followers: "${user.followers.length}",
                       likes: "0",
                       following: '${user.following.length}',
-                      posts: '0',
+                      posts: '0', userID: user.userID,
                     );
                   } else if (snapshot.hasError ||
                       !snapshot.hasData ||
@@ -310,7 +407,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       followers: "${user.followers.length}",
                       likes: "0",
                       following: '${user.following.length}',
-                      posts: '0',
+                      posts: '0', userID: user.userID,
                     );
                   } else {
                     final analytics = snapshot.data!;
@@ -319,9 +416,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       followers: "${user.followers.length}",
                       likes: "${analytics['totalLikes'] ?? 0}",
                       following: '${user.following.length}',
-                      posts: '${analytics['totalPosts'] ?? 0}',
+                      posts: '${analytics['totalPosts'] ?? 0}', userID: user.userID,
                     );
-                    ;
                   }
                 },
               ),
@@ -330,115 +426,99 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Row(
                   children: [
-                    Expanded(
-                      flex: 7,
-                      child: Container(
-                        height: 36,
-                        width: MediaQuery.of(context).size.width,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: BoxDecoration(
-                          color:
-                              !isFollowing && accountOwner != userID
-                                  ? Color(
-                                    AppColors.primaryColor,
-                                  ).withOpacity(0.2)
-                                  : Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                    if (currentUser.userID != displayedUser.userID.toString())
+                      Expanded(
+                        flex: 7,
+                        child: Container(
+                          height: 36,
+                          width: MediaQuery.of(context).size.width,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            color: textColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: MaterialButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () => _toggleFollow(context),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (showIcon)
+                                  Icon(Icons.add, color: textColor, size: 15),
+                                SizedBox(width: showIcon ? 5 : 0),
+                                Text(
+                                  buttonText,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: textColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        child: MaterialButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _toggleFollow(context),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (!isFollowing && accountOwner != userID)
+                      ),
+                    if (currentUser.userID != displayedUser.userID.toString())
+                      const SizedBox(width: 10),
+                    if (currentUser.userID != displayedUser.userID.toString())
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          height: 35,
+                          width: MediaQuery.of(context).size.width,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: MaterialButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              if (currentUser != null && user != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => ChatScreen(
+                                          receiver: user,
+                                          sender: currentUser,
+                                        ),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Unable to start chat. User information missing.',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
                                 Icon(
-                                  Icons.add,
-                                  color: Color(AppColors.primaryColor),
+                                  CupertinoIcons.chat_bubble_2,
+                                  color: Colors.orange,
                                   size: 15,
                                 ),
-                              SizedBox(
-                                width:
-                                    !isFollowing && accountOwner != userID
-                                        ? 5
-                                        : 0,
-                              ),
-                              Text(
-                                !isFollowing && accountOwner != userID
-                                    ? "Follow"
-                                    : "Following",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
-                                  color:
-                                      !isFollowing && accountOwner != userID
-                                          ? Color(AppColors.primaryColor)
-                                          : Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        height: 35,
-                        width: MediaQuery.of(context).size.width,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: MaterialButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            if (currentUserID != null && user != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => ChatScreen(
-                                        receiver: user,
-                                        sender: currentUserID,
-                                      ),
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Unable to start chat. User information missing.',
+                                const SizedBox(width: 5),
+                                Text(
+                                  "Message",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.orange,
                                   ),
-                                  backgroundColor: Colors.red,
                                 ),
-                              );
-                            }
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                CupertinoIcons.chat_bubble_2,
-                                color: Colors.orange,
-                                size: 15,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                "Message",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.orange,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -464,6 +544,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     required String likes,
     required String following,
     required String posts,
+    required String userID
   }) {
     return SizedBox(
       width: MediaQuery.of(context).size.width / 1.2,
@@ -475,6 +556,14 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             context: context,
             data: followers,
             title: 'Followers',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => UserFollowersAndFollowingsScreen(userID: userID),
+                ),
+              );
+            },
           ),
           const SizedBox(width: 5),
           Container(
@@ -486,7 +575,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           _buildProfileActivitySummary(
             context: context,
             data: likes,
-            title: 'Likes',
+            title: 'Likes', onTap: () {  },
           ),
           const SizedBox(width: 5),
           Container(
@@ -499,6 +588,14 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             context: context,
             data: following,
             title: 'following',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => UserFollowersAndFollowingsScreen(userID: userID),
+                ),
+              );
+            },
           ),
           const SizedBox(width: 5),
           Container(
@@ -511,6 +608,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             context: context,
             data: posts,
             title: 'Posts',
+            onTap: () {},
           ),
         ],
       ),
@@ -521,6 +619,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     required BuildContext context,
     required String data,
     required String title,
+    required VoidCallback onTap,
   }) {
     String formatNumber(String data) {
       double number = double.tryParse(data) ?? 0;
@@ -536,23 +635,29 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     }
 
     return Expanded(
-      child: Container(
-        decoration: const BoxDecoration(),
-        child: Column(
-          children: [
-            Text(
-              formatNumber(data),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          decoration: const BoxDecoration(),
+          child: Column(
+            children: [
+              Text(
+                formatNumber(data),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

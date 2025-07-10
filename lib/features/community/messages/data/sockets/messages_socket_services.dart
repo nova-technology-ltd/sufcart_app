@@ -132,6 +132,7 @@ class MessagesSocketServices {
               phoneNumber: '',
               gender: '',
               dob: '',
+              bio: '',
               email: '',
               password: '',
               accountPIN: 0,
