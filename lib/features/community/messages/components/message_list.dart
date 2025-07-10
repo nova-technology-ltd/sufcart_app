@@ -111,6 +111,7 @@ class MessageList extends StatelessWidget {
           isLastInGroup: isLastInGroup,
           isFirstInGroup: isFirstInGroup,
           messagesModel: message,
+
         ),
       );
     } else {
