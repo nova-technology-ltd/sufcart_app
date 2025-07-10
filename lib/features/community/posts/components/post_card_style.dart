@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:sufcart_app/features/community/follows/screens/user_profile_screen.dart';
+import 'package:sufcart_app/features/community/repost/components/emoji_bottom_sheet.dart';
 import 'package:sufcart_app/features/community/repost/socket/repost_socket_provider.dart';
 import '../../../../../utilities/socket/socket_config_provider.dart';
 import '../../../../utilities/components/read_more_text.dart';
@@ -123,22 +124,11 @@ class _PostCardStyleState extends State<PostCardStyle> {
     });
   }
 
-  Future<void> _toggleEmojiPicker() async {
-    try {
-      setState(() {
-        _showEmojiPicker = !_showEmojiPicker;
-      });
-      await _postViewServices.viewPost(context, widget.post.postID);
-    } catch (e) {
-      print('Error in _toggleEmojiPicker: $e');
-    }
-  }
-
   Future<void> _toggleRepost(BuildContext context, String postID) async {
-    try{
+    try {
       await _repostService.repostPost(context, postID);
       await _postViewServices.viewPost(context, widget.post.postID);
-    } catch(e) {
+    } catch (e) {
       print(e);
     }
   }
@@ -249,6 +239,22 @@ class _PostCardStyleState extends State<PostCardStyle> {
     } else {
       return number.toStringAsFixed(0);
     }
+  }
+
+  void _showEmojiBottomSheet({
+    required BuildContext context,
+    required Function(Category?, Emoji)? onEmojiSelected,
+    required VoidCallback? onBackspacePressed,
+  }) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return EmojiBottomSheet(
+          onEmojiSelected: onEmojiSelected,
+          onBackspacePressed: onBackspacePressed,
+        );
+      },
+    );
   }
 
   @override
@@ -471,10 +477,20 @@ class _PostCardStyleState extends State<PostCardStyle> {
                             : const SizedBox.shrink(),
                         SizedBox(height: 5),
                         GestureDetector(
-                          onTap: (){
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostViewScreen(postModel: widget.post)));
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        PostViewScreen(postModel: widget.post),
+                              ),
+                            );
                           },
-                            child: DynamicImageContainer(post: widget.post, user: user)),
+                          child: DynamicImageContainer(
+                            post: widget.post,
+                            user: user,
+                          ),
+                        ),
                         const SizedBox(height: 5),
                         if (groupedReactions.isNotEmpty)
                           SingleChildScrollView(
@@ -487,11 +503,13 @@ class _PostCardStyleState extends State<PostCardStyle> {
                                     return ReactionCardStyle(
                                       reaction: emoji,
                                       count: "$count",
-                                      onTap: (){
-                                        context.read<ReactionSocketProvider>().removeReaction(
-                                          widget.post.postID,
-                                          userReaction?['reactionID'] ?? '',
-                                        );
+                                      onTap: () {
+                                        context
+                                            .read<ReactionSocketProvider>()
+                                            .removeReaction(
+                                              widget.post.postID,
+                                              userReaction?['reactionID'] ?? '',
+                                            );
                                       },
                                     );
                                   }).toList(),
@@ -608,7 +626,14 @@ class _PostCardStyleState extends State<PostCardStyle> {
                                 ),
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: _toggleEmojiPicker,
+                                    onTap:
+                                        () => _showEmojiBottomSheet(
+                                          context: context,
+                                          onEmojiSelected: (category, emoji) {
+                                            _addReaction(context, emoji.emoji);
+                                          },
+                                          onBackspacePressed: () {},
+                                        ),
                                     child: Container(
                                       decoration: const BoxDecoration(
                                         color: Colors.transparent,
@@ -643,7 +668,11 @@ class _PostCardStyleState extends State<PostCardStyle> {
                                 ),
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () => _toggleRepost(context, widget.post.postID),
+                                    onTap:
+                                        () => _toggleRepost(
+                                          context,
+                                          widget.post.postID,
+                                        ),
                                     child: Container(
                                       decoration: const BoxDecoration(
                                         color: Colors.transparent,
@@ -683,16 +712,6 @@ class _PostCardStyleState extends State<PostCardStyle> {
                             ),
                           ),
                         ),
-                        if (_showEmojiPicker)
-                          SizedBox(
-                            height: 250,
-                            child: EmojiPicker(
-                              onEmojiSelected: (category, emoji) {
-                                _addReaction(context, emoji.emoji);
-                              },
-                              config: const Config(),
-                            ),
-                          ),
                       ],
                     ),
                   ),

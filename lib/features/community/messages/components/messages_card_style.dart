@@ -7,8 +7,8 @@ import 'package:sufcart_app/features/profile/model/user_model.dart';
 import 'package:sufcart_app/utilities/constants/app_colors.dart';
 import '../../../../utilities/components/radar_glow_indicator.dart';
 import '../../../profile/model/user_provider.dart';
-import '../model/messages_model.dart';
-import '../provider/messages_socket_provider.dart';
+import '../data/model/messages_model.dart';
+import '../data/provider/messages_socket_provider.dart';
 import '../screens/chat_screen.dart';
 
 class MessagesCardStyle extends StatefulWidget {

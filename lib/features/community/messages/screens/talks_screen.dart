@@ -10,7 +10,8 @@ import 'package:sufcart_app/features/community/messages/sections/active_users_se
 import 'package:sufcart_app/features/profile/model/user_model.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
-import 'package:sufcart_app/features/community/messages/provider/messages_socket_provider.dart';
+
+import '../data/provider/messages_socket_provider.dart';
 
 class TalksScreen extends StatefulWidget {
   const TalksScreen({super.key});

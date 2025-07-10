@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:sufcart_app/features/profile/model/user_model.dart';
 import '../../../../../utilities/socket/socket_config_provider.dart';
 import '../sockets/messages_socket_services.dart';
 import '../model/messages_model.dart';
-import '../../../profile/model/user_model.dart';
+
 
 class MessagesSocketProvider extends ChangeNotifier {
   final MessagesSocketServices _messageServices;
@@ -11,12 +13,15 @@ class MessagesSocketProvider extends ChangeNotifier {
   final List<UserModel> _chatUsers = [];
   String? _errorMessage;
   String? _successMessage;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isSoundPlayedForMessage = false;
   final Map<String, Map<String, String>> _userStatuses = {};
   final Map<String, Map<String, bool>> _userTypingStatuses = {};
   StreamSubscription<Map<String, dynamic>>? _messagesSubscription;
   StreamSubscription<String>? _errorSubscription;
   StreamSubscription<Map<String, dynamic>>? _successSubscription;
   StreamSubscription<List<UserModel>>? _usersSubscription;
+  final String _currentUserID;
 
   List<MessagesModel> fetchChatHistory(String roomID) => _userMessages[roomID] ?? [];
   List<UserModel> get chatUsers => _chatUsers;
@@ -25,9 +30,13 @@ class MessagesSocketProvider extends ChangeNotifier {
   String? getUserStatus(String roomID, String userID) => _userStatuses[roomID]?[userID];
   bool getTypingStatus(String roomID, String userID) => _userTypingStatuses[roomID]?[userID] ?? false;
 
-  MessagesSocketProvider({required SocketConfigProvider socketConfigProvider})
-      : _messageServices = MessagesSocketServices(socketConfigProvider: socketConfigProvider) {
+  MessagesSocketProvider({
+    required SocketConfigProvider socketConfigProvider,
+    required String currentUserID,
+  })  : _messageServices = MessagesSocketServices(socketConfigProvider: socketConfigProvider),
+        _currentUserID = currentUserID {
     _init();
+    _initializeAudioPlayer();
   }
 
   void _init() {
@@ -43,7 +52,7 @@ class MessagesSocketProvider extends ChangeNotifier {
         final message = MessagesModel.fromMap(data['message']);
         final messages = _userMessages[roomID] ?? [];
         if (!messages.any((msg) => msg.messageID == message.messageID)) {
-          _userMessages[roomID] = messages + [message];
+          _userMessages[roomID] = [...messages, message];
           final userIndex = _chatUsers.indexWhere((user) {
             final ids = [user.userID, message.senderID, message.receiverID];
             ids.sort();
@@ -51,6 +60,13 @@ class MessagesSocketProvider extends ChangeNotifier {
           });
           if (userIndex != -1) {
             _chatUsers[userIndex] = _chatUsers[userIndex].copyWith(lastMessage: message);
+          }
+          if (message.senderID != _currentUserID && !_isSoundPlayedForMessage) {
+            _playSound();
+            _isSoundPlayedForMessage = true;
+            Future.delayed(Duration(seconds: 1), () {
+              _isSoundPlayedForMessage = false;
+            });
           }
           notifyListeners();
         }
@@ -112,6 +128,25 @@ class MessagesSocketProvider extends ChangeNotifier {
             notifyListeners();
           }
         }
+      } else if (data['event'] == 'messageDeleted' && data['messageID'] != null) {
+        if (_userMessages[roomID] != null) {
+          final messages = _userMessages[roomID]!;
+          final index = messages.indexWhere((msg) => msg.messageID == data['messageID']);
+          if (index != -1) {
+            _userMessages[roomID]!.removeAt(index);
+            final userIndex = _chatUsers.indexWhere((user) {
+              final ids = [user.userID, messages[index].senderID, messages[index].receiverID];
+              ids.sort();
+              return 'chat:${ids[0]}:${ids[1]}' == roomID;
+            });
+            if (userIndex != -1 && _chatUsers[userIndex].lastMessage?.messageID == data['messageID']) {
+              _chatUsers[userIndex] = _chatUsers[userIndex].copyWith(
+                lastMessage: _userMessages[roomID]!.isNotEmpty ? _userMessages[roomID]!.last : null,
+              );
+            }
+            notifyListeners();
+          }
+        }
       }
     });
 
@@ -147,6 +182,14 @@ class MessagesSocketProvider extends ChangeNotifier {
     return totalUnread;
   }
 
+  Future<void> _initializeAudioPlayer() async {
+    try {
+      await _audioPlayer.setAsset('sounds/new-notification-014-363678.mp3');
+    } catch (e) {
+      debugPrint('Error initializing audio player: $e');
+    }
+  }
+
   Future<void> joinChat(String receiverID) async {
     print('Joining chat with receiverID: $receiverID');
     await _messageServices.joinChat(receiverID);
@@ -154,7 +197,7 @@ class MessagesSocketProvider extends ChangeNotifier {
   }
 
   Future<void> fetchChatUsers() {
-    print('Fetching chat users');
+    print('Loading chat users');
     return _messageServices.fetchChatUsers();
   }
 
@@ -163,18 +206,25 @@ class MessagesSocketProvider extends ChangeNotifier {
     return _messageServices.requestUserStatus(receiverID);
   }
 
-  Future<void> sendMessage(String receiverID, String content, {required List<String> images, required String senderID}) async {
+  Future<void> sendMessage({required String receiverID, required String content, required List<String> images, required String senderID, required String replyTo}) async {
     final roomID = _getRoomID(senderID, receiverID);
     _userTypingStatuses.putIfAbsent(roomID, () => {});
     _userTypingStatuses[roomID]![receiverID] = false;
     notifyListeners();
     print('Sending message to receiverID: $receiverID');
-    return _messageServices.sendMessage(receiverID, content, images: images);
+    return _messageServices.sendMessage(receiverID, content, images: images, replyTo: replyTo);
   }
 
   Future<void> addMessageReaction(String messageID, String reaction) {
     print('Adding message reaction for messageID: $messageID');
+    notifyListeners();
     return _messageServices.addMessageReaction(messageID, reaction);
+  }
+
+  Future<void> deleteMessage(String messageID) async {
+    print('Deleting message for messageID: $messageID');
+    notifyListeners();
+    return _messageServices.deleteMessage(messageID);
   }
 
   Future<void> removeMessageReaction(String messageID, String reactionID) {
@@ -204,6 +254,40 @@ class MessagesSocketProvider extends ChangeNotifier {
     return 'chat:${ids.join(':')}';
   }
 
+  void handleNewMessage(MessagesModel message, String currentUserID) {
+    final roomID = _getRoomID(message.senderID, message.receiverID);
+    final messages = _userMessages[roomID] ?? [];
+    if (!messages.any((msg) => msg.messageID == message.messageID)) {
+      _userMessages[roomID] = [...messages, message];
+      final userIndex = _chatUsers.indexWhere((user) {
+        final ids = [user.userID, message.senderID, message.receiverID];
+        ids.sort();
+        return 'chat:${ids[0]}:${ids[1]}' == roomID;
+      });
+      if (userIndex != -1) {
+        _chatUsers[userIndex] = _chatUsers[userIndex].copyWith(lastMessage: message);
+      }
+      if (message.senderID != currentUserID && !_isSoundPlayedForMessage) {
+        _playSound();
+        _isSoundPlayedForMessage = true;
+        Future.delayed(Duration(seconds: 1), () {
+          _isSoundPlayedForMessage = false;
+        });
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<void> _playSound() async {
+    try {
+      await _audioPlayer.seek(Duration.zero);
+      await _audioPlayer.play();
+      debugPrint('Sound played for new message');
+    } catch (e) {
+      debugPrint('Error playing sound: $e');
+    }
+  }
+
   @override
   void dispose() {
     print('Disposing MessagesSocketProvider');
@@ -212,6 +296,7 @@ class MessagesSocketProvider extends ChangeNotifier {
     _successSubscription?.cancel();
     _usersSubscription?.cancel();
     _messageServices.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 }

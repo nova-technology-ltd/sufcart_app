@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
-import '../provider/messages_socket_provider.dart'; // Adjust the import path
+import '../data/provider/messages_socket_provider.dart';
 
 class ActiveUsersSection extends StatelessWidget {
   final MessagesSocketProvider messagesSocketProvider;

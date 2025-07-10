@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../../utilities/socket/socket_config_provider.dart';
-import '../../../profile/model/user_model.dart';
-import '../../../settings/model/user_settings_model.dart';
+import '../../../../profile/model/user_model.dart';
+import '../../../../settings/model/user_settings_model.dart';
+
 
 class MessagesSocketServices {
   final SocketConfigProvider _socketConfigProvider;
@@ -208,6 +209,20 @@ class MessagesSocketServices {
             'readAt': data['readAt'],
           });
           break;
+        case 'chat:messageDeleted':
+          if (data['messageID'] == null || roomID == null) {
+            print('Invalid chat:messageDeleted data: missing messageID or roomID');
+            _errorController.add(
+              'Invalid chat:messageDeleted data: missing messageID or roomID',
+            );
+            return;
+          }
+          _successController.add({
+            'roomID': roomID,
+            'messageID': data['messageID'],
+            'event': 'messageDeleted',
+          });
+          break;
         case 'fetchUserDetails':
           if (data['user'] != null) {
             try {
@@ -278,6 +293,7 @@ class MessagesSocketServices {
       String receiverID,
       String content, {
         required List<String> images,
+        required String replyTo
       }) async {
     try {
       await _ensureConnected();
@@ -286,9 +302,23 @@ class MessagesSocketServices {
         'receiverID': receiverID,
         'content': content,
         'images': images,
+        'replyTo': replyTo,
       });
     } catch (e) {
       print('Socket connection error in sendMessage: $e');
+      _errorController.add('Socket connection error: $e');
+    }
+  }
+
+  Future<void> deleteMessage(String messageID) async {
+    try {
+      await _ensureConnected();
+      print('Emitting deleteMessage for messageID: $messageID');
+      _socketConfigProvider.emit('deleteMessage', {
+        'messageID': messageID,
+      });
+    } catch (e) {
+      print('Socket connection error in deleteMessage: $e');
       _errorController.add('Socket connection error: $e');
     }
   }

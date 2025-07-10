@@ -8,6 +8,8 @@ class MessagesModel {
   final DateTime createdAt;
   final bool isRead;
   final DateTime? readAt;
+  final DateTime updatedAt;
+  final String replyTo;
 
   MessagesModel({
     required this.messageID,
@@ -17,8 +19,10 @@ class MessagesModel {
     required this.images,
     required this.reactions,
     required this.createdAt,
+    required this.updatedAt,
     required this.isRead,
     this.readAt,
+    required this.replyTo,
   });
 
   factory MessagesModel.fromMap(Map<String, dynamic> map) {
@@ -27,11 +31,17 @@ class MessagesModel {
       senderID: map['senderID'] ?? '',
       receiverID: map['receiverID'] ?? '',
       content: map['content'] ?? '',
-      images: List<String>.from(map['image'] ?? []),
+      images: List<String>.from(map['images'] ?? []),
       reactions: map['reactions'] ?? [],
-      createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        map['createdAt'] ?? DateTime.now().toIso8601String(),
+      ),
+      updatedAt: DateTime.parse(
+        map['updatedAt'] ?? DateTime.now().toIso8601String(),
+      ),
       isRead: map['isRead'] ?? false,
       readAt: map['readAt'] != null ? DateTime.parse(map['readAt']) : null,
+      replyTo: map['replyTo'] ?? '',
     );
   }
 
@@ -44,8 +54,10 @@ class MessagesModel {
       'images': images,
       'reactions': reactions,
       'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
       'isRead': isRead,
       'readAt': readAt?.toIso8601String(),
+      'replyTo': replyTo,
     };
   }
 
@@ -57,8 +69,10 @@ class MessagesModel {
     List<String>? images,
     List<dynamic>? reactions,
     DateTime? createdAt,
+    DateTime? updatedAt,
     bool? isRead,
     DateTime? readAt,
+    String? replyTo,
   }) {
     return MessagesModel(
       messageID: messageID ?? this.messageID,
@@ -68,8 +82,10 @@ class MessagesModel {
       images: images ?? this.images,
       reactions: reactions ?? this.reactions,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       isRead: isRead ?? this.isRead,
       readAt: readAt ?? this.readAt,
+      replyTo: replyTo ?? this.replyTo,
     );
   }
 }

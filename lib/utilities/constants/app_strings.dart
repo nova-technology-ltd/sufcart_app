@@ -1,5 +1,5 @@
 String b = "https://korad-backend.onrender.com";
-String a = "http://192.168.62.255:9000";
+String a = "http://localhost:9000";
 
 class AppStrings {
   static const appNameText = "SufCart";

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:sufcart_app/features/community/messages/model/messages_model.dart';
 
 import '../../community/follows/model/follow_model.dart';
+import '../../community/messages/data/model/messages_model.dart';
 import '../../settings/model/user_settings_model.dart';
 
 class UserModel {

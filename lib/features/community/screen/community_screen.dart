@@ -8,7 +8,7 @@ import '../../../../utilities/themes/theme_provider.dart';
 import '../../../utilities/constants/app_colors.dart';
 import '../../profile/model/user_provider.dart';
 import '../../profile/screens/profile_screen.dart';
-import '../messages/provider/messages_socket_provider.dart';
+import '../messages/data/provider/messages_socket_provider.dart';
 import '../posts/components/post_card_style.dart';
 import '../posts/helper/post_shimmer_loader.dart';
 import '../posts/model/post_model.dart';
