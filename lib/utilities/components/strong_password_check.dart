@@ -18,7 +18,7 @@ class StrongPasswordCheck extends StatelessWidget {
           height: 18,
           width: 18,
           decoration: BoxDecoration(
-            color: isValid ? const Color(AppColors.primaryColor) : Colors.grey[300],
+            color: isValid ? const Color(AppColors.primaryColor) : Colors.grey.withOpacity(0.3),
             shape: BoxShape.circle,
           ),
           child: Center(

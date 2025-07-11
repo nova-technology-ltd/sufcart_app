@@ -54,6 +54,7 @@ class AppIcons {
   static const fast_delivery_icon = "images/fast_delivery.png";
   static const exclusive_deals_icon = "images/exclusive_deals.png";
   static const google_icon = "images/google_icons.png";
+  static const singin_google_icon = "images/pngegg.png";
   static const apple_icon = "images/apple_icon.png";
   static const facebooke_icon = "images/face_book_icons.png";
 

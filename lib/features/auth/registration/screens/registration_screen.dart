@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/features/auth/registration/screens/registration_success_screen.dart';
 
 import '../../../../utilities/components/app_bar_back_arrow.dart';
 import '../../../../utilities/components/custom_button_one.dart';
@@ -65,7 +66,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         hasSymbols;
   }
 
-  void startRegistration({required BuildContext context,
+  Future<void> startRegistration({required BuildContext context,
     required String firstName,
     required String lastName,
     required String otherNames,
@@ -78,7 +79,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       setState(() {
         isLoading = true;
       });
-      await authService.registerUser(
+      int statusCode = await authService.registerUser(
         context: context,
         firstName: firstName,
         lastName: lastName,
@@ -88,9 +89,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         password: password,
         inviteCode: inviteCode
       );
-      setState(() {
-        isLoading = false;
-      });
+
+      if (statusCode == 200 || statusCode == 201) {
+        setState(() {
+          isLoading = false;
+        });
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => RegistrationSuccessScreen()), (route) => false);
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -410,7 +419,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         color: termsAndConditionsCheck
                                             ? Colors.black
                                             : Colors.grey,
-                                        fontSize: 13,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w500
                                       ),
                                     ),
@@ -420,20 +429,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         color: termsAndConditionsCheck
                                             ? const Color(AppColors.primaryColor)
                                             : const Color(AppColors.primaryColor).withOpacity(0.5),
-                                        fontSize: 13,
+                                        fontSize: 11,
                                         fontWeight: FontWeight.w500
                                       ),
                                     )
                                   ])),
                                 ),
                               ),
-                              CupertinoSwitch(
-                                activeColor: const Color(AppColors.primaryColor),
-                                  value: termsAndConditionsCheck, onChanged: (value) {
-                                setState(() {
-                                  termsAndConditionsCheck = value;
-                                });
-                              })
+                              Transform.scale(
+                                scale: 0.8,
+                                child: CupertinoSwitch(
+                                  activeColor: const Color(AppColors.primaryColor),
+                                    value: termsAndConditionsCheck, onChanged: (value) {
+                                  setState(() {
+                                    termsAndConditionsCheck = value;
+                                  });
+                                }),
+                              )
                             ],
                           ),
                           const SizedBox(height: 10,),
@@ -451,7 +463,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                               color: privacyAndPolicyCheck
                                                   ? Colors.black
                                                   : Colors.grey,
-                                              fontSize: 13,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.w500
                                           ),
                                         ),
@@ -461,20 +473,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                               color: privacyAndPolicyCheck
                                                   ? const Color(AppColors.primaryColor)
                                                   : const Color(AppColors.primaryColor).withOpacity(0.5),
-                                              fontSize: 13,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.w500
                                           ),
                                         )
                                       ])),
                                 ),
                               ),
-                              CupertinoSwitch(
-                                  activeColor: const Color(AppColors.primaryColor),
-                                  value: privacyAndPolicyCheck, onChanged: (value) {
-                                setState(() {
-                                  privacyAndPolicyCheck = value;
-                                });
-                              })
+                              Transform.scale(
+                                scale: 0.8,
+                                child: CupertinoSwitch(
+                                    activeColor: const Color(AppColors.primaryColor),
+                                    value: privacyAndPolicyCheck, onChanged: (value) {
+                                  setState(() {
+                                    privacyAndPolicyCheck = value;
+                                  });
+                                }),
+                              )
                             ],
                           ),
                         ],

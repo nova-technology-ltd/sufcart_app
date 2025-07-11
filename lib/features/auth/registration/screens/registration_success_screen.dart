@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/utilities/components/moving_circles_screen.dart';
 
 import '../../../../utilities/components/custom_button_one.dart';
 import '../../../../utilities/constants/app_colors.dart';
@@ -16,73 +18,78 @@ class RegistrationSuccessScreen extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-        surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: Stack(
-          children: [
-            // Align(
-            //   alignment: Alignment.bottomCenter,
-            //     child: SizedBox(
-            //       height: MediaQuery.of(context).size.height,
-            //         width: MediaQuery.of(context).size.width,
-            //         child: LottieBuilder.asset(AppLottieAnime.celebrateAnime))),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Container(
-                      height: 70,
-                      width: 70,
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(AppColors.primaryColor)
-                      ),
-                      child: const Center(child: Icon(Icons.check, color: Colors.white,))),
-                ),
-                const Text(
-                  "Congratulations!",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                        children: [
-                          TextSpan(
-                              text: "You have successfully created your ",
-                              style: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 11,
-                              )
-                          ),
-                          const TextSpan(
-                              text: AppStrings.appNameText,
-                              style: TextStyle(
-                                  color: Color(AppColors.primaryColor),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500
-                              )
-                          ),
-                          TextSpan(
-                              text: " Account and it's now ready for use, click on the button bellow to get into your account and start exploring all that we offer.",
-                              style: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 11,
-                              )
-                          ),
-                        ]
-                    )),
-              ],
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
+      //   surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+      // ),
+      body: Stack(
+        children: [
+          MovingCirclesScreen(),
+          Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.8)
             ),
-          ],
-        ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: LottieBuilder.asset(AppLottieAnime.celebrateAnime))),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Container(
+                    height: 70,
+                    width: 70,
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(AppColors.primaryColor)
+                    ),
+                    child: const Center(child: Icon(Icons.check, color: Colors.white,))),
+              ),
+              const Text(
+                "Congratulations!",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                      children: [
+                        TextSpan(
+                            text: "You have successfully created your ",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 11,
+                            )
+                        ),
+                        const TextSpan(
+                            text: AppStrings.appNameText,
+                            style: TextStyle(
+                                color: Color(AppColors.primaryColor),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500
+                            )
+                        ),
+                        TextSpan(
+                            text: " Account and it's now ready for use, click on the button bellow to get into your account and start exploring all that we offer.",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 11,
+                            )
+                        ),
+                      ]
+                  )),
+            ],
+          ),
+        ],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
