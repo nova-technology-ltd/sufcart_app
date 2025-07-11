@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sufcart_app/features/community/follows/components/profile_post_tab_card.dart';
 import 'package:sufcart_app/features/community/follows/components/profile_repost_tab_card.dart';
 import 'package:sufcart_app/features/community/posts/components/profile_post_tab_shimma_loader.dart';
-import 'package:sufcart_app/features/community/posts/model/post_model.dart';
-import 'package:sufcart_app/features/community/repost/model/repost_model.dart';
 
 class ProfileRepostSection extends StatefulWidget {
   final Future<List<Map<String, dynamic>>> futureReposts;

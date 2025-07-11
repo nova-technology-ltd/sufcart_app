@@ -5,6 +5,7 @@ import 'package:sufcart_app/features/community/follows/components/user_connectio
 import 'package:sufcart_app/features/community/follows/screens/user_followers_and_followings_screen.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
 import 'package:sufcart_app/utilities/components/app_bar_back_arrow.dart';
+import 'package:sufcart_app/utilities/components/read_more_text.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 
 import '../../../../utilities/constants/app_colors.dart';
@@ -38,16 +39,21 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
   final RepostService _repostService = RepostService();
 
   // Function to refresh posts
-  void _refreshPosts() {
+  Future<void> _refreshScreen() async {
     setState(() {
       _futurePosts = _postServices.postsByUser(context, widget.user.userID);
+      _futureReposts = _repostService.repostsByUser(context, widget.user.userID);
+      _futureAnalytics = _followsServices.userProfileAnalytics(
+        context,
+        widget.user.userID,
+      );
+      _futureConnections = _followsServices.getConnections(context);
     });
   }
   // Function to handle post deletion
   Future<void> _handleDeletePost(PostModel post) async {
     try {
-      await _postServices.deletePost(context, post.postID); // Assuming deletePost method exists
-      // _refreshPosts(); // Refresh the posts list after deletion
+      await _postServices.deletePost(context, post.postID);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to delete post: $e')),
@@ -58,8 +64,8 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    _futurePosts = _postServices.postsByUser(context, widget.user!.userID);
-    _futureReposts = _repostService.repostsByUser(context, widget.user!.userID);
+    _futurePosts = _postServices.postsByUser(context, widget.user.userID);
+    _futureReposts = _repostService.repostsByUser(context, widget.user.userID);
     _futureAnalytics = _followsServices.userProfileAnalytics(
       context,
       widget.user.userID,
@@ -289,13 +295,7 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                             user.email,
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                          Text(
-                            "this is where the bio will be placed, note that",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                          user.bio.isEmpty ? const SizedBox.shrink() : ReadMoreText(longText: user.bio, size: 12, color: Color(AppColors.primaryColor),),
                         ],
                       ),
                     ),
@@ -335,25 +335,28 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                                 child: Row(
                                   children: [
                                     for (int i = 0; i < 9; i++)
-                                      Container(
-                                        height: 55,
-                                        width: 55,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.withOpacity(0.2),
-                                          shape: BoxShape.circle
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                        child: Container(
+                                          height: 55,
+                                          width: 55,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.2),
+                                            shape: BoxShape.circle
+                                          ),
                                         ),
                                       )
                                   ],
                                 ),
                               );
                             } else if (snapshot.hasError) {
-                              return const Center(child: Text('No followers'));
+                              return const Center(child: Text('No connections'));
                             } else if (!snapshot.hasData ||
                                 snapshot.data!.isEmpty) {
-                              return const Center(child: Text('No followers'));
+                              return const Center(child: Text('No connections'));
                             }
 
-                            final followers = snapshot.data!;
+                            final connections = snapshot.data!;
                             return SingleChildScrollView(
                               physics: const BouncingScrollPhysics(),
                               child: Padding(
@@ -363,13 +366,13 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                    children: followers.asMap().entries.map((entry) {
+                                    children: connections.asMap().entries.map((entry) {
                                       final index = entry.key;
                                       final user = entry.value;
                                       return Padding(
                                         padding: EdgeInsets.only(
                                           left: index == 0 ? 10.0 : 4.0,
-                                          right: index == followers.length - 1 ? 10.0 : 4.0,
+                                          right: index == connections.length - 1 ? 10.0 : 4.0,
                                         ),
                                         child: UserConnectionsCardOne(user: user),
                                       );

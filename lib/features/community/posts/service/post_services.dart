@@ -42,7 +42,7 @@ class PostServices {
     }
   }
 
-  Future<void> getPostByID(BuildContext context, String postID) async {
+  Future<PostModel> getPostByID(BuildContext context, String postID) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("Authorization");
@@ -50,8 +50,16 @@ class PostServices {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token"
       });
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        final postData = responseData['data'] as Map<String, dynamic>;
+        return PostModel.fromMap(postData);
+      } else {
+        throw Exception("Failed to fetch post: ${response.statusCode}");
+      }
     } catch (e) {
       showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
+      throw Exception("Error fetching post: $e");
     }
   }
 
@@ -66,17 +74,11 @@ class PostServices {
           "Authorization": "Bearer $token",
         },
       );
-      print(response.body);
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> postsData = jsonResponse['data'] as List<dynamic>;
         return postsData.map((postJson) => PostModel.fromMap(postJson as Map<String, dynamic>)).toList();
       } else {
-        showSnackBar(
-          context: context,
-          message: AppStrings.serverErrorMessage,
-          title: "Server Error",
-        );
         return [];
       }
     } catch (e) {

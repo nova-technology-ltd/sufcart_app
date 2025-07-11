@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,8 +7,9 @@ import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/features/community/posts/helper/post_view_shimmer.dart';
+import 'package:sufcart_app/features/community/posts/service/post_services.dart';
 import 'package:sufcart_app/utilities/constants/app_colors.dart';
-
 import '../../../../../utilities/themes/theme_provider.dart';
 import '../../../../utilities/components/app_bar_back_arrow.dart';
 import '../../../../utilities/constants/app_icons.dart';
@@ -27,9 +27,9 @@ import '../../views/services/post_view_services.dart';
 import '../model/post_model.dart';
 
 class PostViewScreen extends StatefulWidget {
-  final PostModel postModel;
+  final String postID;
 
-  const PostViewScreen({super.key, required this.postModel});
+  const PostViewScreen({super.key, required this.postID});
 
   @override
   State<PostViewScreen> createState() => _PostViewScreenState();
@@ -37,22 +37,23 @@ class PostViewScreen extends StatefulWidget {
 
 class _PostViewScreenState extends State<PostViewScreen> {
   final PostViewServices _postViewServices = PostViewServices();
-  int _currentImageIndex = 0;
-  late Future<List<CommentModel>> _futureComments;
+  final PostServices _postServices = PostServices();
   final CommentServices _commentServices = CommentServices();
+  final RepostService _repostService = RepostService();
+  int _currentImageIndex = 0;
+  late Future<PostModel> _futurePost;
+  late Future<List<CommentModel>> _futureComments;
   bool _isDownloading = false;
+  bool _showEmojiPicker = false;
 
   @override
   void initState() {
     super.initState();
-    _postViewServices.viewPost(context, widget.postModel.postID);
-    _futureComments = _commentServices.postComments(
-      context,
-      widget.postModel.postID,
-    );
+    // Initialize the future to fetch the post
+    _futurePost = _postServices.getPostByID(context, widget.postID);
   }
 
-  Future<void> _downloadImage() async {
+  Future<void> _downloadImage(String imageUrl) async {
     try {
       setState(() {
         _isDownloading = true;
@@ -77,16 +78,14 @@ class _PostViewScreenState extends State<PostViewScreen> {
       final fileName = 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final filePath = '$folderPath/$fileName';
 
-      final response = await http.get(
-        Uri.parse(widget.postModel.postImages[_currentImageIndex]),
-      );
+      final response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {
         final file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Image saved to $filePath')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Image saved to $filePath')),
+          );
         }
       } else {
         if (mounted) {
@@ -97,9 +96,9 @@ class _PostViewScreenState extends State<PostViewScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error downloading image: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error downloading image: $e')),
+        );
       }
     } finally {
       if (mounted) {
@@ -131,9 +130,6 @@ class _PostViewScreenState extends State<PostViewScreen> {
     }
   }
 
-  bool _showEmojiPicker = false;
-  final RepostService _repostService = RepostService();
-
   Map<String, int> _groupReactions(List<dynamic> reactions) {
     final Map<String, int> grouped = {};
     for (var reaction in reactions) {
@@ -143,12 +139,12 @@ class _PostViewScreenState extends State<PostViewScreen> {
     return grouped;
   }
 
-  Future<void> _toggleEmojiPicker() async {
+  Future<void> _toggleEmojiPicker(String postID) async {
     try {
       setState(() {
         _showEmojiPicker = !_showEmojiPicker;
       });
-      await _postViewServices.viewPost(context, widget.postModel.postID);
+      await _postViewServices.viewPost(context, postID);
     } catch (e) {
       print('Error in _toggleEmojiPicker: $e');
     }
@@ -157,9 +153,9 @@ class _PostViewScreenState extends State<PostViewScreen> {
   Future<void> _toggleRepost(BuildContext context, String postID) async {
     try {
       await _repostService.repostPost(context, postID);
-      await _postViewServices.viewPost(context, widget.postModel.postID);
+      await _postViewServices.viewPost(context, postID);
     } catch (e) {
-      print(e);
+      print('Error in _toggleRepost: $e');
     }
   }
 
@@ -179,68 +175,87 @@ class _PostViewScreenState extends State<PostViewScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final theme = Theme.of(context);
-    final formattedTime = formatRelativeTime(widget.postModel.createdAt);
-    final user = Provider.of<UserProvider>(context).userModel;
 
     return Scaffold(
       backgroundColor:
-          isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: false,
-            floating: true,
-            snap: true,
-            automaticallyImplyLeading: false,
-            leadingWidth: MediaQuery.of(context).size.width,
-            backgroundColor: isDarkMode ? null : Colors.white,
-            surfaceTintColor:
-                isDarkMode
-                    ? Color(AppColors.primaryColorDarkMode)
-                    : Colors.white,
-            leading: _buildAppBarContent(formattedTime, isDarkMode, theme),
-            actions: [
-              IconButton(
-                icon:
-                    _isDownloading
+      isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+      body: FutureBuilder<PostModel>(
+        future: _futurePost,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return PostViewShimmer();
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Error loading post: ${snapshot.error}',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                  fontSize: 16,
+                ),
+              ),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: Text('No post found'));
+          }
+
+          final postModel = snapshot.data!;
+          // Initialize comments future after post is fetched
+          _futureComments = _commentServices.postComments(context, postModel.postID);
+
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: false,
+                floating: true,
+                snap: true,
+                automaticallyImplyLeading: false,
+                leadingWidth: MediaQuery.of(context).size.width,
+                backgroundColor: isDarkMode ? null : Colors.white,
+                surfaceTintColor:
+                isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+                leading: _buildAppBarContent(postModel, isDarkMode, theme),
+                actions: [
+                  IconButton(
+                    icon: _isDownloading
                         ? const CupertinoActivityIndicator()
                         : const Icon(CupertinoIcons.cloud_download),
-                onPressed: _downloadImage,
-                tooltip: "Download",
+                    onPressed: () => _downloadImage(postModel.postImages[_currentImageIndex]),
+                    tooltip: "Download",
+                  ),
+                ],
+              ),
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (postModel.postImages.isNotEmpty) _buildPostImages(postModel),
+                    _buildPostContent(postModel, isDarkMode, theme),
+                    _buildPostStats(postModel, isDarkMode, theme),
+                    Divider(
+                      height: 1,
+                      thickness: 0.5,
+                      color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    ),
+                  ],
+                ),
               ),
             ],
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.postModel.postImages.isNotEmpty) _buildPostImages(),
-                _buildPostContent(isDarkMode, theme),
-                _buildPostStats(isDarkMode, theme),
-                Divider(
-                  height: 1,
-                  thickness: 0.5,
-                  color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                ),
-              ],
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildAppBarContent(
-    String formattedTime,
-    bool isDarkMode,
-    ThemeData theme,
-  ) {
+  Widget _buildAppBarContent(PostModel postModel, bool isDarkMode, ThemeData theme) {
+    final formattedTime = formatRelativeTime(postModel.createdAt);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
             color: Colors.grey,
             size: 20,
@@ -255,14 +270,13 @@ class _PostViewScreenState extends State<PostViewScreen> {
             shape: BoxShape.circle,
           ),
           child: Image.network(
-            widget.postModel.userDetails?.image ?? '',
+            postModel.userDetails?.image ?? '',
             fit: BoxFit.cover,
-            errorBuilder:
-                (context, error, stackTrace) => Icon(
-                  IconlyBold.profile,
-                  size: 18,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                ),
+            errorBuilder: (context, error, stackTrace) => Icon(
+              IconlyBold.profile,
+              size: 18,
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            ),
           ),
         ),
         const SizedBox(width: 5),
@@ -272,8 +286,8 @@ class _PostViewScreenState extends State<PostViewScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.postModel.userDetails?.userName ?? 'Unknown',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                postModel.userDetails?.userName ?? 'Unknown',
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 2),
               Text(
@@ -290,15 +304,15 @@ class _PostViewScreenState extends State<PostViewScreen> {
     );
   }
 
-  Widget _buildPostImages() {
+  Widget _buildPostImages(PostModel postModel) {
     return Column(
       children: [
         CarouselSlider(
           options: CarouselOptions(
             height: 500,
             viewportFraction: 1.0,
-            enableInfiniteScroll: widget.postModel.postImages.length > 1,
-            autoPlay: widget.postModel.postImages.length > 1,
+            enableInfiniteScroll: postModel.postImages.length > 1,
+            autoPlay: postModel.postImages.length > 1,
             autoPlayInterval: const Duration(seconds: 5),
             onPageChanged: (index, reason) {
               setState(() {
@@ -306,67 +320,62 @@ class _PostViewScreenState extends State<PostViewScreen> {
               });
             },
           ),
-          items:
-              widget.postModel.postImages.map((image) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(color: Colors.grey[200]),
-                  child: Image.network(
-                    image,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value:
-                              loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      (loadingProgress.expectedTotalBytes ?? 1)
-                                  : null,
-                        ),
-                      );
-                    },
-                    errorBuilder:
-                        (context, error, stackTrace) => Icon(
-                          Icons.broken_image,
-                          size: 50,
-                          color: Colors.grey[400],
-                        ),
-                  ),
-                );
-              }).toList(),
+          items: postModel.postImages.map((image) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: Image.network(
+                image,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                          (loadingProgress.expectedTotalBytes ?? 1)
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  Icons.broken_image,
+                  size: 50,
+                  color: Colors.grey[400],
+                ),
+              ),
+            );
+          }).toList(),
         ),
-        if (widget.postModel.postImages.length > 1)
+        if (postModel.postImages.length > 1)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children:
-                  widget.postModel.postImages.asMap().entries.map((entry) {
-                    return Container(
-                      width: _currentImageIndex == entry.key ? 8 : 6,
-                      height: _currentImageIndex == entry.key ? 8 : 6,
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color:
-                            _currentImageIndex == entry.key
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey.withOpacity(0.4),
-                      ),
-                    );
-                  }).toList(),
+              children: postModel.postImages.asMap().entries.map((entry) {
+                return Container(
+                  width: _currentImageIndex == entry.key ? 8 : 6,
+                  height: _currentImageIndex == entry.key ? 8 : 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentImageIndex == entry.key
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey.withOpacity(0.4),
+                  ),
+                );
+              }).toList(),
             ),
           ),
       ],
     );
   }
 
-  Widget _buildPostContent(bool isDarkMode, ThemeData theme) {
+  Widget _buildPostContent(PostModel postModel, bool isDarkMode, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Text(
-        widget.postModel.postText,
+        postModel.postText,
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w400,
@@ -413,32 +422,27 @@ class _PostViewScreenState extends State<PostViewScreen> {
     );
   }
 
-  Widget _buildPostStats(bool isDarkMode, ThemeData theme) {
+  Widget _buildPostStats(PostModel postModel, bool isDarkMode, ThemeData theme) {
     final userID = context.read<UserProvider>().userModel.userID;
-    final postOwnerID = widget.postModel.userDetails?.userID.toString();
-    final userFollowing = context.read<UserProvider>().userModel.following;
     return Consumer4<
-      LikeSocketProvider,
-      ReactionSocketProvider,
-      FollowsSocketProvider,
-      RepostSocketProvider
-    >(
+        LikeSocketProvider,
+        ReactionSocketProvider,
+        FollowsSocketProvider,
+        RepostSocketProvider>(
       builder: (
-        context,
-        likeProvider,
-        reactionProvider,
-        followsProvider,
-        repostProvider,
-        child,
-      ) {
-        final reactions = reactionProvider.getReactions(
-          widget.postModel.postID,
-        );
-        final reposts = repostProvider.getRepost(widget.postModel.postID);
+          context,
+          likeProvider,
+          reactionProvider,
+          followsProvider,
+          repostProvider,
+          child,
+          ) {
+        final reactions = reactionProvider.getReactions(postModel.postID);
+        final reposts = repostProvider.getRepost(postModel.postID);
         final reactionCount = reactions.length;
         final repostCount = reposts.length;
         final userReaction = reactions.firstWhere(
-          (r) => r['userID'] == userID,
+              (r) => r['userID'] == userID,
           orElse: () => null,
         );
         final groupedReactions = _groupReactions(reactions);
@@ -451,23 +455,20 @@ class _PostViewScreenState extends State<PostViewScreen> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children:
-                        groupedReactions.entries.map((entry) {
-                          final emoji = entry.key;
-                          final count = entry.value;
-                          return ReactionCardStyle(
-                            reaction: emoji,
-                            count: "$count",
-                            onTap: () {
-                              context
-                                  .read<ReactionSocketProvider>()
-                                  .removeReaction(
-                                    widget.postModel.postID,
-                                    userReaction?['reactionID'] ?? '',
-                                  );
-                            },
+                    children: groupedReactions.entries.map((entry) {
+                      final emoji = entry.key;
+                      final count = entry.value;
+                      return ReactionCardStyle(
+                        reaction: emoji,
+                        count: "$count",
+                        onTap: () {
+                          context.read<ReactionSocketProvider>().removeReaction(
+                            postModel.postID,
+                            userReaction?['reactionID'] ?? '',
                           );
-                        }).toList(),
+                        },
+                      );
+                    }).toList(),
                   ),
                 ),
               SizedBox(height: groupedReactions.isNotEmpty ? 5 : 0),
@@ -475,27 +476,21 @@ class _PostViewScreenState extends State<PostViewScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildStatButton(
-                    icon:
-                        widget.postModel.likes.any(
-                              (like) => like.userID == widget.postModel.userID,
-                            )
-                            ? IconlyBold.heart
-                            : IconlyLight.heart,
-                    color:
-                        widget.postModel.likes.any(
-                              (like) => like.userID == widget.postModel.userID,
-                            )
-                            ? Colors.red
-                            : isDarkMode
-                            ? Colors.grey[400]!
-                            : Colors.grey[600]!,
-                    count: widget.postModel.likes.length,
+                    icon: postModel.likes.any((like) => like.userID == userID)
+                        ? IconlyBold.heart
+                        : IconlyLight.heart,
+                    color: postModel.likes.any((like) => like.userID == userID)
+                        ? Colors.red
+                        : isDarkMode
+                        ? Colors.grey[400]!
+                        : Colors.grey[600]!,
+                    count: postModel.likes.length,
                     onTap: () {
                       // Implement like functionality
                     },
                   ),
                   GestureDetector(
-                    onTap: () => _showCommentBottomSheet(context),
+                    onTap: () => _showCommentBottomSheet(context, postModel),
                     child: Container(
                       decoration: const BoxDecoration(
                         color: Colors.transparent,
@@ -517,26 +512,20 @@ class _PostViewScreenState extends State<PostViewScreen> {
                   _buildStatButton(
                     icon: IconlyLight.show,
                     color: isDarkMode ? Colors.grey[400]! : Colors.grey[600]!,
-                    count: int.parse(
-                      formatNumber(
-                        double.parse("${widget.postModel.views.length}"),
-                      ),
-                    ),
+                    count: int.parse(formatNumber(double.parse("${postModel.views.length}"))),
                     onTap: () {},
                   ),
                   _buildStatButton(
                     icon: Icons.emoji_emotions_outlined,
                     color: isDarkMode ? Colors.grey[400]! : Colors.grey[600]!,
-                    count: int.parse(
-                      formatNumber(double.parse("$reactionCount")),
-                    ),
-                    onTap: _toggleEmojiPicker,
+                    count: int.parse(formatNumber(double.parse("$reactionCount"))),
+                    onTap: () => _toggleEmojiPicker(postModel.postID),
                   ),
                   _buildStatButton(
                     icon: Icons.repeat,
                     color: isDarkMode ? Colors.grey[400]! : Colors.grey[600]!,
-                    count: 0,
-                    onTap: () => _toggleRepost(context, widget.postModel.postID),
+                    count: repostCount,
+                    onTap: () => _toggleRepost(context, postModel.postID),
                   ),
                 ],
               ),
@@ -572,13 +561,12 @@ class _PostViewScreenState extends State<PostViewScreen> {
     );
   }
 
-  void _showCommentBottomSheet(BuildContext context) {
+  void _showCommentBottomSheet(BuildContext context, PostModel postModel) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (context) => CommentBottomSheetSection(postModel: widget.postModel),
+      builder: (context) => CommentBottomSheetSection(postModel: postModel),
     );
   }
 }

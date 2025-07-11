@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sufcart_app/features/profile/model/user_model.dart';
 import 'package:sufcart_app/utilities/constants/app_colors.dart';
@@ -41,9 +42,11 @@ class MyConnectionsCardStyle extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     height: 50,
@@ -70,16 +73,17 @@ class MyConnectionsCardStyle extends StatelessWidget {
                   const SizedBox(width: 5),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         displayName,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
-                        "user bio goes here",
+                        user.bio.isEmpty ? "Joined: ${DateFormat('MMMM d, y').format(DateTime.parse("${user.createdAt}"))}" : user.bio,
                         style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],

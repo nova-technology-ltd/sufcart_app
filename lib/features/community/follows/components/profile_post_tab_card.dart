@@ -16,7 +16,7 @@ class ProfilePostTabCard extends StatelessWidget {
       padding: const EdgeInsets.all(1.0),
       child: GestureDetector(
         onTap: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostViewScreen(postModel: postModel)));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostViewScreen(postID: postModel.postID)));
         },
         onLongPress: onLongPress,
         child: Container(

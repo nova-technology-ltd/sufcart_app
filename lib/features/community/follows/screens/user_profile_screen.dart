@@ -522,12 +522,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
-              Padding(
+              SizedBox(height: user.bio.isEmpty ? 0 : 15),
+              user.bio.isEmpty ? const SizedBox.shrink() : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: ReadMoreText(
                   longText:
-                      "🎵 Singer-Songwriter | 🎸 Guitar Enthusiast | 🎤 Performing Artist",
+                      user.bio,
                 ),
               ),
               const SizedBox(height: 15),

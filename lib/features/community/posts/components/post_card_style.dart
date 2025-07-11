@@ -482,7 +482,7 @@ class _PostCardStyleState extends State<PostCardStyle> {
                               MaterialPageRoute(
                                 builder:
                                     (context) =>
-                                        PostViewScreen(postModel: widget.post),
+                                        PostViewScreen(postID: widget.post.postID),
                               ),
                             );
                           },

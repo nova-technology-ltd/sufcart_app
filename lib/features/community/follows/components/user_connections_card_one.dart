@@ -40,9 +40,9 @@ class UserConnectionsCardOne extends StatelessWidget {
             height: 55,
             width: 55,
             clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.grey,
+              color: Colors.grey.withOpacity(0.2),
             ),
             child: user.image.isNotEmpty == true
                 ? Image.network(
@@ -60,16 +60,16 @@ class UserConnectionsCardOne extends StatelessWidget {
               errorBuilder: (context, error, stackTrace) => const Center(
                 child: Icon(
                   IconlyBold.profile,
-                  color: Colors.white,
-                  size: 24,
+                  color: Colors.grey,
+                  size: 18,
                 ),
               ),
             )
                 : const Center(
               child: Icon(
                 IconlyBold.profile,
-                color: Colors.white,
-                size: 24,
+                color: Colors.grey,
+                size: 18,
               ),
             ),
           ),
