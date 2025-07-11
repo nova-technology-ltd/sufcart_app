@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:sufcart_app/features/community/follows/screens/user_profile_screen.dart';
+import 'package:sufcart_app/features/community/report/screens/report_screen.dart';
 import 'package:sufcart_app/features/community/repost/components/emoji_bottom_sheet.dart';
 import 'package:sufcart_app/features/community/repost/socket/repost_socket_provider.dart';
 import '../../../../../utilities/socket/socket_config_provider.dart';
@@ -88,6 +89,12 @@ class _PostCardStyleState extends State<PostCardStyle> {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CommentBottomSheetSection(postModel: widget.post),
+    );
+  }
+  void _showReportScreen(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => ReportScreen(postID: widget.post.postID,),
     );
   }
 
@@ -307,258 +314,223 @@ class _PostCardStyleState extends State<PostCardStyle> {
               //   ),
               // );
             },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: const BoxDecoration(color: Colors.transparent),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Row(
-                            children: [
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap:
-                                        user.userID ==
-                                                widget.post.userDetails?.userID
-                                            ? () {}
-                                            : () {
-                                              Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (
-                                                        context,
-                                                      ) => UserProfileScreen(
-                                                        user:
-                                                            widget
-                                                                .post
-                                                                .userDetails,
-                                                      ),
-                                                  settings: RouteSettings(
-                                                    arguments: {
-                                                      'heroTag':
-                                                          "userProfile_${widget.post.userDetails?.userID}_${widget.post.postID}",
-                                                    },
+            child: GestureDetector(
+              onLongPress: () => _showReportScreen(context),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(color: Colors.transparent),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Row(
+                              children: [
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap:
+                                          user.userID ==
+                                                  widget.post.userDetails?.userID
+                                              ? () {}
+                                              : () {
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (
+                                                          context,
+                                                        ) => UserProfileScreen(
+                                                          user:
+                                                              widget
+                                                                  .post
+                                                                  .userDetails,
+                                                        ),
+                                                    settings: RouteSettings(
+                                                      arguments: {
+                                                        'heroTag':
+                                                            "userProfile_${widget.post.userDetails?.userID}_${widget.post.postID}",
+                                                      },
+                                                    ),
                                                   ),
+                                                );
+                                              },
+                                      child: Hero(
+                                        tag:
+                                            "userProfile_${widget.post.userDetails?.userID}_${widget.post.postID}",
+                                        child: Container(
+                                          height: 40,
+                                          width: 40,
+                                          clipBehavior: Clip.antiAlias,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.2),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Image.network(
+                                            widget.post.userDetails!.image,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, err, st) {
+                                              return const Center(
+                                                child: Icon(
+                                                  IconlyBold.profile,
+                                                  color: Colors.grey,
+                                                  size: 15,
                                                 ),
                                               );
                                             },
-                                    child: Hero(
-                                      tag:
-                                          "userProfile_${widget.post.userDetails?.userID}_${widget.post.postID}",
-                                      child: Container(
-                                        height: 40,
-                                        width: 40,
-                                        clipBehavior: Clip.antiAlias,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.withOpacity(0.2),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Image.network(
-                                          widget.post.userDetails!.image,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, err, st) {
-                                            return const Center(
-                                              child: Icon(
-                                                IconlyBold.profile,
-                                                color: Colors.grey,
-                                                size: 15,
-                                              ),
-                                            );
-                                          },
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            widget.post.userDetails!.firstName,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 2.0,
-                                            ),
-                                            child: Container(
-                                              height: 4,
-                                              width: 4,
-                                              decoration: const BoxDecoration(
-                                                color: Colors.grey,
-                                                shape: BoxShape.circle,
+                                    const SizedBox(width: 5),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              widget.post.userDetails!.firstName,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 2.0,
+                                              ),
+                                              child: Container(
+                                                height: 4,
+                                                width: 4,
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.grey,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              formattedTime,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          widget.post.userDetails!.userName,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
                                           ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                if (!isFollowing && postOwnerID != userID)
+                                  Container(
+                                    height: 30,
+                                    width: 75,
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: BoxDecoration(
+                                      color: const Color(AppColors.primaryColor),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: MaterialButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () => _toggleFollow(context),
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                            size: 14,
+                                          ),
+                                          SizedBox(width: 2),
                                           Text(
-                                            formattedTime,
-                                            style: const TextStyle(
+                                            "Follow",
+                                            style: TextStyle(
                                               fontSize: 11,
-                                              color: Colors.grey,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      Text(
-                                        widget.post.userDetails!.userName,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const Spacer(),
-                              if (!isFollowing && postOwnerID != userID)
-                                Container(
-                                  height: 30,
-                                  width: 75,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
-                                    color: const Color(AppColors.primaryColor),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: MaterialButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () => _toggleFollow(context),
-                                    child: const Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.add,
-                                          color: Colors.white,
-                                          size: 14,
-                                        ),
-                                        SizedBox(width: 2),
-                                        Text(
-                                          "Follow",
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        widget.post.postText.isNotEmpty
-                            ? Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
-                              ),
-                              child: ReadMoreText(
-                                longText: widget.post.postText,
-                                color: isDarkMode ? null : Colors.black,
-                              ),
-                            )
-                            : const SizedBox.shrink(),
-                        SizedBox(height: 5),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        PostViewScreen(postID: widget.post.postID),
-                              ),
-                            );
-                          },
-                          child: DynamicImageContainer(
-                            post: widget.post,
-                            user: user,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        if (groupedReactions.isNotEmpty)
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children:
-                                  groupedReactions.entries.map((entry) {
-                                    final emoji = entry.key;
-                                    final count = entry.value;
-                                    return ReactionCardStyle(
-                                      reaction: emoji,
-                                      count: "$count",
-                                      onTap: () {
-                                        context
-                                            .read<ReactionSocketProvider>()
-                                            .removeReaction(
-                                              widget.post.postID,
-                                              userReaction?['reactionID'] ?? '',
-                                            );
-                                      },
-                                    );
-                                  }).toList(),
+                              ],
                             ),
                           ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: SizedBox(
-                            height: 30,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: Colors.transparent,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          height: 20,
-                                          width: 20,
-                                          child: Image.asset(
-                                            AppIcons.viewsIcon,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Text(
-                                          formatNumber(
-                                            double.parse(
-                                              "${widget.post.views.length}",
-                                            ),
-                                          ),
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                          SizedBox(height: 5),
+                          widget.post.postText.isNotEmpty
+                              ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
                                 ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap:
-                                        () => _showCommentBottomSheet(context),
+                                child: ReadMoreText(
+                                  longText: widget.post.postText,
+                                  color: isDarkMode ? null : Colors.black,
+                                ),
+                              )
+                              : const SizedBox.shrink(),
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          PostViewScreen(postID: widget.post.postID),
+                                ),
+                              );
+                            },
+                            child: DynamicImageContainer(
+                              post: widget.post,
+                              user: user,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          if (groupedReactions.isNotEmpty)
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children:
+                                    groupedReactions.entries.map((entry) {
+                                      final emoji = entry.key;
+                                      final count = entry.value;
+                                      return ReactionCardStyle(
+                                        reaction: emoji,
+                                        count: "$count",
+                                        onTap: () {
+                                          context
+                                              .read<ReactionSocketProvider>()
+                                              .removeReaction(
+                                                widget.post.postID,
+                                                userReaction?['reactionID'] ?? '',
+                                              );
+                                        },
+                                      );
+                                    }).toList(),
+                              ),
+                            ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: SizedBox(
+                              height: 30,
+                              child: Row(
+                                children: [
+                                  Expanded(
                                     child: Container(
                                       decoration: const BoxDecoration(
                                         color: Colors.transparent,
@@ -571,46 +543,15 @@ class _PostCardStyleState extends State<PostCardStyle> {
                                             height: 20,
                                             width: 20,
                                             child: Image.asset(
-                                              AppIcons.commentIcon,
+                                              AppIcons.viewsIcon,
                                               color: Colors.grey,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 5),
-                                          _totalComments(),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => _toggleLike(context),
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        color: Colors.transparent,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            height: 21,
-                                            width: 21,
-                                            child: Image.asset(
-                                              _isLiked
-                                                  ? AppIcons.heartSelected
-                                                  : AppIcons.heartUnselected,
-                                              color:
-                                                  _isLiked
-                                                      ? Colors.red
-                                                      : Colors.grey,
                                             ),
                                           ),
                                           const SizedBox(width: 5),
                                           Text(
                                             formatNumber(
                                               double.parse(
-                                                _likeCount.toString(),
+                                                "${widget.post.views.length}",
                                               ),
                                             ),
                                             style: const TextStyle(
@@ -623,106 +564,175 @@ class _PostCardStyleState extends State<PostCardStyle> {
                                       ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap:
-                                        () => _showEmojiBottomSheet(
-                                          context: context,
-                                          onEmojiSelected: (category, emoji) {
-                                            _addReaction(context, emoji.emoji);
-                                          },
-                                          onBackspacePressed: () {},
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap:
+                                          () => _showCommentBottomSheet(context),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.transparent,
                                         ),
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        color: Colors.transparent,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            height: 19,
-                                            width: 19,
-                                            child: Image.asset(
-                                              AppIcons.reactionIcon,
-                                              color: Colors.grey,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: Image.asset(
+                                                AppIcons.commentIcon,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            formatNumber(
-                                              double.parse("$reactionCount"),
-                                            ),
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 5),
+                                            _totalComments(),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap:
-                                        () => _toggleRepost(
-                                          context,
-                                          widget.post.postID,
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _toggleLike(context),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.transparent,
                                         ),
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        color: Colors.transparent,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child: Icon(
-                                              Icons.repeat,
-                                              size: 20,
-                                              color: Colors.grey,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              height: 21,
+                                              width: 21,
+                                              child: Image.asset(
+                                                _isLiked
+                                                    ? AppIcons.heartSelected
+                                                    : AppIcons.heartUnselected,
+                                                color:
+                                                    _isLiked
+                                                        ? Colors.red
+                                                        : Colors.grey,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            formatNumber(
-                                              double.parse("$repostCount"),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              formatNumber(
+                                                double.parse(
+                                                  _likeCount.toString(),
+                                                ),
+                                              ),
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap:
+                                          () => _showEmojiBottomSheet(
+                                            context: context,
+                                            onEmojiSelected: (category, emoji) {
+                                              _addReaction(context, emoji.emoji);
+                                            },
+                                            onBackspacePressed: () {},
+                                          ),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.transparent,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              height: 19,
+                                              width: 19,
+                                              child: Image.asset(
+                                                AppIcons.reactionIcon,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              formatNumber(
+                                                double.parse("$reactionCount"),
+                                              ),
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap:
+                                          () => _toggleRepost(
+                                            context,
+                                            widget.post.postID,
+                                          ),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.transparent,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: Icon(
+                                                IconlyLight.upload,
+                                                size: 20,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              formatNumber(
+                                                double.parse("$repostCount"),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    height: 10,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
+                    Container(
+                      height: 10,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

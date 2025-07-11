@@ -76,7 +76,6 @@ class FollowsServices {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token"
       });
-      print(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final List<dynamic> responseData = jsonDecode(response.body)['data'];
         for (var userData in responseData) {
@@ -99,9 +98,6 @@ class FollowsServices {
       final response = await http.get(
         Uri.parse("$baseUrl/api/v1/org/community/follows/search?userName=$query"),
       );
-
-      print(response.body);
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = json.decode(response.body);
         List<UserModel> users = [];
@@ -111,34 +107,14 @@ class FollowsServices {
           }
           return users;
         } else {
-          showSnackBar(
-            context: context,
-            message: "Invalid response format from server",
-            title: "Data Error",
-          );
           return [];
         }
       } else {
-        showSnackBar(
-          context: context,
-          message: "Failed to search recipients: ${response.statusCode}",
-          title: "Search Error",
-        );
         return [];
       }
     } on FormatException catch (e) {
-      showSnackBar(
-        context: context,
-        message: "Data format error: ${e.message}",
-        title: "Data Error",
-      );
       return [];
     } on http.ClientException catch (e) {
-      showSnackBar(
-        context: context,
-        message: "Network error: ${e.message}",
-        title: "Network Error",
-      );
       return [];
     } catch (e) {
       showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
@@ -158,50 +134,21 @@ class FollowsServices {
           "Authorization": "Bearer $token"
         },
       );
-      print(response.body);
       if (response.statusCode == 200) {
-        // Parse the JSON response into a Map<String, dynamic>
         final Map<String, dynamic> analyticsData = jsonDecode(response.body);
-
-        // Verify the response structure
         if (analyticsData['title'] == 'Success' && analyticsData['data'] != null) {
           return analyticsData['data'] as Map<String, dynamic>;
         } else {
-          showSnackBar(
-            context: context,
-            message: 'Unexpected response format',
-            title: 'Error',
-          );
           return {};
         }
       } else if (response.statusCode == 401) {
-        showSnackBar(
-          context: context,
-          message: 'You must be logged in to access this resource',
-          title: 'Unauthorized',
-        );
         return {};
       } else if (response.statusCode == 404) {
-        showSnackBar(
-          context: context,
-          message: 'No posts found for this user',
-          title: 'Not Found',
-        );
         return {};
       } else {
-        showSnackBar(
-          context: context,
-          message: 'Server Error: ${response.statusCode}',
-          title: 'Server Error',
-        );
         return {};
       }
     } catch (e) {
-      showSnackBar(
-        context: context,
-        message: AppStrings.serverErrorMessage,
-        title: 'Server Error',
-      );
       return {};
     }
   }

@@ -48,7 +48,7 @@ class _ProfileRepostSectionState extends State<ProfileRepostSection>
           return const Center(child: Text('No posts available'));
         }
 
-        final posts = snapshot.data!;
+        final posts = snapshot.data!.reversed.toList();
         return SingleChildScrollView(
           child: Column(
             children: [

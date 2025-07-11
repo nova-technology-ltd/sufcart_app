@@ -75,7 +75,7 @@ class _ProfilePostTabSectionState extends State<ProfilePostTabSection>
           return const Center(child: Text('No posts available'));
         }
 
-        _posts = snapshot.data!; // Update local posts list
+        _posts = snapshot.data!.reversed.toList();
         return SingleChildScrollView(
           child: Column(
             children: [
@@ -88,7 +88,6 @@ class _ProfilePostTabSectionState extends State<ProfilePostTabSection>
                             ? ProfilePostTabCard(
                           postModel: _posts[i * 3 + j],
                           onLongPress: () {
-                            print("Long Pressed");
                             // Check if current user is the post owner
                             if (user.userID == _posts[i * 3 + j].userID) {
                               _showDeleteDialog(
