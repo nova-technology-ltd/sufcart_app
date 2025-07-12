@@ -22,7 +22,8 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -47,7 +48,10 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
     );
     final provider = context.read<MessagesSocketProvider>();
     provider.joinChat(widget.receiver.userID);
-    final roomID = ChatHelper.getRoomID(widget.sender.userID, widget.receiver.userID);
+    final roomID = ChatHelper.getRoomID(
+      widget.sender.userID,
+      widget.receiver.userID,
+    );
     final messages = provider.fetchChatHistory(roomID);
     for (var msg in messages) {
       if (msg.receiverID == widget.sender.userID && !msg.isRead) {
@@ -70,7 +74,9 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
     _textFieldFocusNode.dispose();
     _searchFocusNode.dispose();
     _dragAnimationController.dispose();
-    context.read<MessagesSocketProvider>().removeListener(_handleProviderChanges);
+    context.read<MessagesSocketProvider>().removeListener(
+      _handleProviderChanges,
+    );
     super.dispose();
   }
 
@@ -99,7 +105,9 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       final pickedFiles = await _picker.pickMultiImage();
       if (pickedFiles.isNotEmpty) {
         setState(() {
-          postResultImages.addAll(pickedFiles.map((pickedFile) => File(pickedFile.path)));
+          postResultImages.addAll(
+            pickedFiles.map((pickedFile) => File(pickedFile.path)),
+          );
         });
         _scrollToBottom();
       }
@@ -139,7 +147,9 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       setState(() {
         isSendingImages = true;
       });
-      final List<String> downloadUrls = await _uploadAllImages(postResultImages);
+      final List<String> downloadUrls = await _uploadAllImages(
+        postResultImages,
+      );
       context.read<MessagesSocketProvider>().sendMessage(
         senderID: widget.sender.userID,
         images: downloadUrls,
@@ -215,17 +225,31 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final provider = context.watch<MessagesSocketProvider>();
-    final roomID = ChatHelper.getRoomID(widget.sender.userID, widget.receiver.userID);
+    final roomID = ChatHelper.getRoomID(
+      widget.sender.userID,
+      widget.receiver.userID,
+    );
     final allMessages = provider.fetchChatHistory(roomID);
-    final messages = allMessages
-        .where((msg) =>
-    (msg.senderID == widget.sender.userID && msg.receiverID == widget.receiver.userID) ||
-        (msg.senderID == widget.receiver.userID && msg.receiverID == widget.sender.userID))
-        .toList();
-    final filteredMessages = _searchQuery.isEmpty
-        ? messages
-        : messages.where((msg) => msg.content.toLowerCase().contains(_searchQuery)).toList();
-    final isReceiverTyping = provider.getTypingStatus(roomID, widget.receiver.userID) &&
+    final messages =
+        allMessages
+            .where(
+              (msg) =>
+                  (msg.senderID == widget.sender.userID &&
+                      msg.receiverID == widget.receiver.userID) ||
+                  (msg.senderID == widget.receiver.userID &&
+                      msg.receiverID == widget.sender.userID),
+            )
+            .toList();
+    final filteredMessages =
+        _searchQuery.isEmpty
+            ? messages
+            : messages
+                .where(
+                  (msg) => msg.content.toLowerCase().contains(_searchQuery),
+                )
+                .toList();
+    final isReceiverTyping =
+        provider.getTypingStatus(roomID, widget.receiver.userID) &&
         widget.receiver.userID != widget.sender.userID;
 
     return Scaffold(

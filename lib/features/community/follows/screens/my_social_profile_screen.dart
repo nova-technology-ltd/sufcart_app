@@ -42,7 +42,10 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
   Future<void> _refreshScreen() async {
     setState(() {
       _futurePosts = _postServices.postsByUser(context, widget.user.userID);
-      _futureReposts = _repostService.repostsByUser(context, widget.user.userID);
+      _futureReposts = _repostService.repostsByUser(
+        context,
+        widget.user.userID,
+      );
       _futureAnalytics = _followsServices.userProfileAnalytics(
         context,
         widget.user.userID,
@@ -50,14 +53,15 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
       _futureConnections = _followsServices.getConnections(context);
     });
   }
+
   // Function to handle post deletion
   Future<void> _handleDeletePost(PostModel post) async {
     try {
       await _postServices.deletePost(context, post.postID);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete post: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete post: $e')));
     }
   }
 
@@ -85,7 +89,10 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
           return [
             SliverAppBar(
               pinned: true,
-              backgroundColor: isDarkMode ? null : Colors.white,
+              backgroundColor:
+                  isDarkMode
+                      ? Color(AppColors.primaryColorDarkMode)
+                      : Colors.white,
               surfaceTintColor:
                   isDarkMode
                       ? Color(AppColors.primaryColorDarkMode)
@@ -295,7 +302,13 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                             user.email,
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                          user.bio.isEmpty ? const SizedBox.shrink() : ReadMoreText(longText: user.bio, size: 12, color: Color(AppColors.primaryColor),),
+                          user.bio.isEmpty
+                              ? const SizedBox.shrink()
+                              : ReadMoreText(
+                                longText: user.bio,
+                                size: 12,
+                                color: Color(AppColors.primaryColor),
+                              ),
                         ],
                       ),
                     ),
@@ -336,24 +349,30 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                                   children: [
                                     for (int i = 0; i < 9; i++)
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 5.0,
+                                        ),
                                         child: Container(
                                           height: 55,
                                           width: 55,
                                           decoration: BoxDecoration(
                                             color: Colors.grey.withOpacity(0.2),
-                                            shape: BoxShape.circle
+                                            shape: BoxShape.circle,
                                           ),
                                         ),
-                                      )
+                                      ),
                                   ],
                                 ),
                               );
                             } else if (snapshot.hasError) {
-                              return const Center(child: Text('No connections'));
+                              return const Center(
+                                child: Text('No connections'),
+                              );
                             } else if (!snapshot.hasData ||
                                 snapshot.data!.isEmpty) {
-                              return const Center(child: Text('No connections'));
+                              return const Center(
+                                child: Text('No connections'),
+                              );
                             }
 
                             final connections = snapshot.data!;
@@ -366,17 +385,23 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                    children: connections.asMap().entries.map((entry) {
-                                      final index = entry.key;
-                                      final user = entry.value;
-                                      return Padding(
-                                        padding: EdgeInsets.only(
-                                          left: index == 0 ? 10.0 : 4.0,
-                                          right: index == connections.length - 1 ? 10.0 : 4.0,
-                                        ),
-                                        child: UserConnectionsCardOne(user: user),
-                                      );
-                                    }).toList(),
+                                  children:
+                                      connections.asMap().entries.map((entry) {
+                                        final index = entry.key;
+                                        final user = entry.value;
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            left: index == 0 ? 10.0 : 4.0,
+                                            right:
+                                                index == connections.length - 1
+                                                    ? 10.0
+                                                    : 4.0,
+                                          ),
+                                          child: UserConnectionsCardOne(
+                                            user: user,
+                                          ),
+                                        );
+                                      }).toList(),
                                 ),
                               ),
                             );
@@ -427,7 +452,10 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
           controller: _tabController,
           physics: BouncingScrollPhysics(),
           children: [
-            ProfilePostTabSection(futurePosts: _futurePosts, onDeletePost: _handleDeletePost,),
+            ProfilePostTabSection(
+              futurePosts: _futurePosts,
+              onDeletePost: _handleDeletePost,
+            ),
             ProfileRepostSection(futureReposts: _futureReposts),
           ],
         ),

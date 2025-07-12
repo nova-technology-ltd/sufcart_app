@@ -94,7 +94,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Scaffold(
       backgroundColor: isDarkMode ? null : Colors.white,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? null : Colors.white,
+        backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         automaticallyImplyLeading: false,
         title: Column(

@@ -209,12 +209,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final currentUser = Provider.of<UserProvider>(context).userModel;
     final displayedUser = widget.user!;
 
     return Scaffold(
-      backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
+      backgroundColor: isDarkMode ? null : Colors.white,
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
@@ -227,11 +227,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 },
               ),
               actions: [],
-              backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-              surfaceTintColor:
-                  themeProvider.isDarkMode
-                      ? Color(AppColors.primaryColorDarkMode)
-                      : Colors.white,
+              backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+              surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
               elevation: 0,
               scrolledUnderElevation: 1,
               centerTitle: true,

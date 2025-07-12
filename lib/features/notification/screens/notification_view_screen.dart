@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/utilities/constants/app_colors.dart';
 
 import '../../../utilities/components/app_bar_back_arrow.dart';
 import '../../../utilities/themes/theme_provider.dart';
@@ -23,8 +24,8 @@ class _NotificationViewScreenState extends State<NotificationViewScreen> {
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
       appBar: AppBar(
-        backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-        surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         leadingWidth: 90,
         title: Text(
           DateFormat('MMMM dd, yyyy')

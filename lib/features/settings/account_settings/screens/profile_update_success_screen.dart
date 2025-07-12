@@ -28,8 +28,8 @@ class _ProfileUpdateSuccessScreenState extends State<ProfileUpdateSuccessScreen>
       backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-        surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),

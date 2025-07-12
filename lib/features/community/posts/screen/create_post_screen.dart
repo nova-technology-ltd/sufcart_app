@@ -8,6 +8,7 @@ import '../../../../utilities/components/app_bar_back_arrow.dart';
 import '../../../../utilities/components/cloudinary_eervices.dart';
 import '../../../../utilities/components/custom_text_field.dart';
 import '../../../../utilities/components/show_snack_bar.dart';
+import '../../../../utilities/constants/app_colors.dart';
 import '../../../../utilities/constants/app_icons.dart';
 import '../../../../utilities/constants/app_strings.dart';
 import '../../../../utilities/themes/theme_provider.dart';
@@ -92,8 +93,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     return Scaffold(
       backgroundColor: isDarkMode ? null : Colors.white,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? null : Colors.white,
-        surfaceTintColor: isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         automaticallyImplyLeading: false,
         leadingWidth: 90,
         centerTitle: true,

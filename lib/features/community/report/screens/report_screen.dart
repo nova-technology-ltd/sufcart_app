@@ -240,9 +240,8 @@ class _ReportScreenState extends State<ReportScreen>
                   ? _backToCategories
                   : () => Navigator.pop(context),
         ),
-        backgroundColor: isDarkMode ? null : Colors.white,
-        surfaceTintColor:
-            isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         elevation: 0,
         centerTitle: true,
         leadingWidth: 90,

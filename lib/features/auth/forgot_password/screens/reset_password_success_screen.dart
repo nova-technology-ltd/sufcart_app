@@ -17,8 +17,8 @@ class ResetPasswordSuccessScreen extends StatelessWidget {
       backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-        surfaceTintColor: themeProvider.isDarkMode ? null : Colors.white,
+        backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),

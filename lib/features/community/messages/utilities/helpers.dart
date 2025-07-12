@@ -23,7 +23,7 @@ class ChatHelper {
       } else if (messageDate == yesterday) {
         dateText = 'Yesterday';
       } else {
-        dateText = DateFormat('d MMMM').format(date);
+        dateText = DateFormat('d MMM yyyy').format(date);
       }
 
       return Padding(
@@ -39,7 +39,7 @@ class ChatHelper {
               dateText,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
                 color: isDarkMode ? null : Colors.grey,
               ),
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:iconly/iconly.dart';
 import 'package:sufcart_app/features/community/messages/components/message_bubbles/receiver_message_link_bubble.dart';
+import 'package:sufcart_app/features/profile/model/user_provider.dart';
 import '../components/typing_indicator.dart';
 import '../../../profile/model/user_model.dart';
 import '../data/model/messages_model.dart';
@@ -42,16 +44,81 @@ class MessageList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loggedInUser = Provider.of<UserProvider>(context).userModel;
     return messages.isEmpty
         ? Center(
       child: FadeIn(
         duration: const Duration(milliseconds: 600),
-        child: Text(
-          'No messages yet',
-          style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-            fontSize: 16,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 70,
+              width: 70,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.2),
+                shape: BoxShape.circle
+              ),
+              child: Image.network(receiver.image, fit: BoxFit.cover, errorBuilder: (context, err, st) {
+                return Center(
+                  child: Icon(IconlyBold.profile, color: Colors.grey,),
+                );
+              },),
+            ),
+            Text(
+              '${receiver.firstName} ${receiver.lastName} ${receiver.otherNames}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500
+              ),
+            ),
+            receiver.userName.isEmpty ? const SizedBox.shrink() : Text(
+              receiver.userName,
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "${receiver.followers.length} Followers",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Container(
+                    height: 4,
+                    width: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      shape: BoxShape.circle
+                    ),
+                  ),
+                ),
+                Text(
+                  "${receiver.following.length} Following",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              receiver.followers.isNotEmpty && receiver.followers[0].userID == loggedInUser.userID ? "You've followed this SufCart account" : 'You are still yet to follow this SufCart account',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 13,
+              ),
+            ),
+          ],
         ),
       ),
     )
@@ -66,6 +133,79 @@ class MessageList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 70,
+                  width: 70,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.2),
+                      shape: BoxShape.circle
+                  ),
+                  child: Image.network(receiver.image, fit: BoxFit.cover, errorBuilder: (context, err, st) {
+                    return Center(
+                      child: Icon(IconlyBold.profile, color: Colors.grey,),
+                    );
+                  },),
+                ),
+                const SizedBox(height: 3,),
+                Text(
+                  '${receiver.firstName} ${receiver.lastName} ${receiver.otherNames}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500
+                  ),
+                ),
+                receiver.userName.isEmpty ? const SizedBox.shrink() : Text(
+                  receiver.userName,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${receiver.followers.length} Followers",
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Container(
+                        height: 4,
+                        width: 4,
+                        decoration: BoxDecoration(
+                            color: Colors.grey,
+                            shape: BoxShape.circle
+                        ),
+                      ),
+                    ),
+                    Text(
+                      "${receiver.following.length} Following",
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  receiver.followers.isNotEmpty && receiver.followers[0].userID == loggedInUser.userID ? "You've followed this SufCart account" : 'You are still yet to follow this SufCart account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
             for (var i = 0; i < messages.length; i++)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,

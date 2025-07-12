@@ -109,8 +109,8 @@ class _InviteFamilyAndFriendsScreenState extends State<InviteFamilyAndFriendsScr
         Scaffold(
           backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
           appBar: AppBar(
-            backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-            surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+            backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+            surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
             centerTitle: true,
             automaticallyImplyLeading: false,
             leadingWidth: 90,

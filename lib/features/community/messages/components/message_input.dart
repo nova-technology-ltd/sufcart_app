@@ -268,7 +268,7 @@ class MessageInput extends StatelessWidget {
                     child: Transform.rotate(
                       angle: 0.8,
                       child: Icon(
-                        IconlyBold.send,
+                        IconlyLight.send,
                         color: Colors.grey,
                         size: 25,
                       ),

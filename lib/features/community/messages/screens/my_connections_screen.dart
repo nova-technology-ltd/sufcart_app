@@ -5,6 +5,7 @@ import 'package:sufcart_app/features/community/follows/components/my_connections
 import 'package:sufcart_app/features/community/follows/services/follows_services.dart';
 import 'package:sufcart_app/utilities/components/app_bar_back_arrow.dart';
 
+import '../../../../utilities/constants/app_colors.dart';
 import '../../../../utilities/themes/theme_provider.dart';
 import '../../../profile/model/user_model.dart';
 import '../../../profile/model/user_provider.dart';
@@ -44,8 +45,8 @@ class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
           ],
         ),
         centerTitle: true,
-        backgroundColor: isDarkMode ? null : Colors.white,
-        surfaceTintColor: isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         automaticallyImplyLeading: false,
         leadingWidth: 90,
         leading: AppBarBackArrow(onClick: () => Navigator.pop(context)),

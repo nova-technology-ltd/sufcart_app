@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../utilities/components/app_bar_back_arrow.dart';
+import '../../../../utilities/constants/app_colors.dart';
 import '../../../../utilities/themes/theme_provider.dart';
 
 class TermsAndCondition extends StatelessWidget {
@@ -13,8 +14,8 @@ class TermsAndCondition extends StatelessWidget {
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
       appBar: AppBar(
-        backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-        surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         automaticallyImplyLeading: false,
         leadingWidth: 90,
         centerTitle: true,

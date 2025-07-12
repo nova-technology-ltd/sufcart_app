@@ -215,8 +215,8 @@ class _ComplaintViewScreenState extends State<ComplaintViewScreen> {
           Scaffold(
             backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
             appBar: AppBar(
-              backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-              surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+              backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+              surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
               automaticallyImplyLeading: true,
               leadingWidth: 100,
               leading: Padding(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:sufcart_app/features/community/follows/screens/user_profile_screen.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
 import '../../../../utilities/constants/app_colors.dart';
 import '../../../profile/model/user_model.dart';
@@ -36,7 +37,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     final user = Provider.of<UserProvider>(context).userModel;
     final fullName = "${receiver.firstName} ${receiver.lastName} ${receiver.otherNames}";
     return AppBar(
-      backgroundColor: isDarkMode ? null : Colors.white,
+      backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
       surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
       leadingWidth: 0,
       automaticallyImplyLeading: false,
@@ -70,24 +71,29 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(width: 10),
           ElasticIn(
             duration: const Duration(milliseconds: 800),
-            child: Container(
-              height: 35,
-              width: 35,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Image.network(
-                receiver.image,
-                errorBuilder: (context, err, st) => const Center(
-                  child: Icon(
-                    IconlyBold.profile,
-                    color: Colors.grey,
-                    size: 17,
-                  ),
+            child: GestureDetector(
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: receiver)));
+              },
+              child: Container(
+                height: 35,
+                width: 35,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.2),
+                  shape: BoxShape.circle,
                 ),
-                fit: BoxFit.cover,
+                child: Image.network(
+                  receiver.image,
+                  errorBuilder: (context, err, st) => const Center(
+                    child: Icon(
+                      IconlyBold.profile,
+                      color: Colors.grey,
+                      size: 17,
+                    ),
+                  ),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),

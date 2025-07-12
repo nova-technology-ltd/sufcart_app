@@ -52,9 +52,8 @@ class _UserFollowersAndFollowingsScreenState
     return Scaffold(
       backgroundColor: isDarkMode ? null : Colors.white,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? null : Colors.white,
-        surfaceTintColor:
-        isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         leadingWidth: 90,
         leading: AppBarBackArrow(
           onClick: () {

@@ -122,14 +122,14 @@ class _UsersScreenState extends State<UsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context).isDarkMode;
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final usersToDisplay = _isSearching ? _searchResults : _allUsers;
 
     return Scaffold(
-      backgroundColor: themeProvider ? null : Colors.white,
+      backgroundColor: isDarkMode ? null : Colors.white,
       appBar: AppBar(
-        backgroundColor: themeProvider ? null : Colors.white,
-        surfaceTintColor: themeProvider ? Colors.black : Colors.white,
+        backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: const Text(

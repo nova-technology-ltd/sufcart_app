@@ -79,8 +79,8 @@ class _ResetNewPasswordScreenState extends State<ResetNewPasswordScreen> {
                 Navigator.pop(context);
               }),
               leadingWidth: 90,
-              backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
-              surfaceTintColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+              backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+              surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
             ),
             body: Padding(
               padding: const EdgeInsets.all(10.0),

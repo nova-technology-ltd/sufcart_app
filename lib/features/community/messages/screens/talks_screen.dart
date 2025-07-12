@@ -214,8 +214,8 @@ class _TalksScreenState extends State<TalksScreen> {
               ],
             ),
             centerTitle: true,
-            backgroundColor: isDarkMode ? null : Colors.white,
-            surfaceTintColor: isDarkMode ? Colors.black : Colors.white,
+            backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+            surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
             automaticallyImplyLeading: false,
           ),
           body: SingleChildScrollView(

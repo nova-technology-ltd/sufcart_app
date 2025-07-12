@@ -98,7 +98,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
       appBar: AppBar(
-        backgroundColor: themeProvider.isDarkMode ? null : Colors.white,
+        backgroundColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+        surfaceTintColor: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
         elevation: 0,
       ),
       body: Center(

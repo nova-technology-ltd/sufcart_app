@@ -212,9 +212,8 @@ class _PostViewScreenState extends State<PostViewScreen> {
                 snap: true,
                 automaticallyImplyLeading: false,
                 leadingWidth: MediaQuery.of(context).size.width,
-                backgroundColor: isDarkMode ? null : Colors.white,
-                surfaceTintColor:
-                isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+                backgroundColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
+                surfaceTintColor: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
                 leading: _buildAppBarContent(postModel, isDarkMode, theme),
                 actions: [
                   IconButton(
