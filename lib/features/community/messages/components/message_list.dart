@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:sufcart_app/features/community/messages/components/message_bubbles/receiver_message_link_bubble.dart';
 import '../components/typing_indicator.dart';
 import '../../../profile/model/user_model.dart';
 import '../data/model/messages_model.dart';
@@ -8,6 +9,7 @@ import '../data/provider/messages_socket_provider.dart';
 import '../utilities/helpers.dart';
 import 'message_bubbles/receiver_message_bubble.dart';
 import 'message_bubbles/sender_message_bubble.dart';
+import 'message_bubbles/sender_link_message_bubble.dart';
 
 class MessageList extends StatelessWidget {
   final List<MessagesModel> messages;
@@ -28,6 +30,15 @@ class MessageList extends StatelessWidget {
     required this.isReceiverTyping,
     required this.onReply,
   });
+
+  // Helper method to detect URLs in text
+  bool _containsUrl(String text) {
+    final urlRegex = RegExp(
+      r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+',
+      caseSensitive: false,
+    );
+    return urlRegex.hasMatch(text);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,43 +108,90 @@ class MessageList extends StatelessWidget {
     final isLastInGroup = currentIndex == messages.length - 1 || messages[currentIndex + 1].senderID != message.senderID;
 
     if (message.senderID == currentUserId) {
-      return Align(
-        alignment: Alignment.centerRight,
-        child: SenderMessageBubble(
-          isDarkMode: isDarkMode,
-          onReply: onReply,
-          onReactionSelected: (reaction) {
-            context.read<MessagesSocketProvider>().addMessageReaction(message.messageID, reaction);
-          },
-          onReactionRemoved: (messageId, reactionId) {
-            context.read<MessagesSocketProvider>().removeMessageReaction(messageId, reactionId);
-          },
-          isLastInGroup: isLastInGroup,
-          isFirstInGroup: isFirstInGroup,
-          messagesModel: message,
-
-        ),
-      );
+      // Check if message contains URL and no images
+      if (_containsUrl(message.content) && message.images.isEmpty) {
+        return Align(
+          alignment: Alignment.centerRight,
+          child: SenderLinkMessageBubble(
+            isDarkMode: isDarkMode,
+            onReply: onReply,
+            onReactionSelected: (reaction) {
+              context.read<MessagesSocketProvider>().addMessageReaction(
+                  message.messageID, reaction);
+            },
+            onReactionRemoved: (messageId, reactionId) {
+              context.read<MessagesSocketProvider>().removeMessageReaction(
+                  messageId, reactionId);
+            },
+            isLastInGroup: isLastInGroup,
+            isFirstInGroup: isFirstInGroup,
+            messagesModel: message,
+          ),
+        );
+      } else {
+        // Regular message bubble
+        return Align(
+          alignment: Alignment.centerRight,
+          child: SenderMessageBubble(
+            isDarkMode: isDarkMode,
+            onReply: onReply,
+            onReactionSelected: (reaction) {
+              context.read<MessagesSocketProvider>().addMessageReaction(
+                  message.messageID, reaction);
+            },
+            onReactionRemoved: (messageId, reactionId) {
+              context.read<MessagesSocketProvider>().removeMessageReaction(
+                  messageId, reactionId);
+            },
+            isLastInGroup: isLastInGroup,
+            isFirstInGroup: isFirstInGroup,
+            messagesModel: message,
+          ),
+        );
+      }
     } else {
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: ReceiverMessageBubble(
-          isDarkMode: isDarkMode,
-          userData: receiver,
-          messageID: message.messageID,
-          onReply: onReply,
-          replyTo: {},
-          onReactionSelected: (reaction) {
-            context.read<MessagesSocketProvider>().addMessageReaction(message.messageID, reaction);
-          },
-          onReactionRemoved: (messageId, reactionId) {
-            context.read<MessagesSocketProvider>().removeMessageReaction(messageId, reactionId);
-          },
-          isLastInGroup: isLastInGroup,
-          isFirstInGroup: isFirstInGroup,
-          messagesModel: message,
-        ),
-      );
+      if (_containsUrl(message.content) && message.images.isEmpty) {
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: ReceiverMessageLinkBubble(
+            isDarkMode: isDarkMode,
+            onReply: onReply,
+            onReactionSelected: (reaction) {
+              context.read<MessagesSocketProvider>().addMessageReaction(
+                  message.messageID, reaction);
+            },
+            onReactionRemoved: (messageId, reactionId) {
+              context.read<MessagesSocketProvider>().removeMessageReaction(
+                  messageId, reactionId);
+            },
+            isLastInGroup: isLastInGroup,
+            isFirstInGroup: isFirstInGroup,
+            messagesModel: message,
+          ),
+        );
+      } else {
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: ReceiverMessageBubble(
+            isDarkMode: isDarkMode,
+            userData: receiver,
+            messageID: message.messageID,
+            onReply: onReply,
+            replyTo: {},
+            onReactionSelected: (reaction) {
+              context.read<MessagesSocketProvider>().addMessageReaction(
+                  message.messageID, reaction);
+            },
+            onReactionRemoved: (messageId, reactionId) {
+              context.read<MessagesSocketProvider>().removeMessageReaction(
+                  messageId, reactionId);
+            },
+            isLastInGroup: isLastInGroup,
+            isFirstInGroup: isFirstInGroup,
+            messagesModel: message,
+          ),
+        );
+      }
     }
   }
 }

@@ -168,6 +168,7 @@ class MessageInput extends StatelessWidget {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
               onTap: onPickImages,
@@ -185,21 +186,22 @@ class MessageInput extends StatelessWidget {
             const SizedBox(width: 5),
             Expanded(
               child: Container(
-                height: 40,
+                constraints: BoxConstraints(
+                  maxHeight: 4 * 40.0,
+                ),
                 decoration: BoxDecoration(),
                 child: TextFormField(
                   controller: messageController,
                   focusNode: textFieldFocusNode,
                   minLines: 1,
                   maxLines: 4,
-                  cursorHeight: 15,
+                  cursorHeight: 17,
                   cursorColor: Colors.grey,
                   keyboardType: TextInputType.multiline,
                   textInputAction: TextInputAction.newline,
                   readOnly: postResultImages.isNotEmpty ? true : false,
                   decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: const BorderSide(color: Colors.transparent),
@@ -217,35 +219,30 @@ class MessageInput extends StatelessWidget {
                         : Colors.grey[200]!.withOpacity(0.5),
                     filled: true,
                     hintText: replyToContent != null
-                        ? "Replying to: ${replyToContent!.length > 17
-                        ? '${replyToContent!.substring(0, 17)}...'
-                        : replyToContent}"
+                        ? "Replying to: ${replyToContent!.length > 17 ? '${replyToContent!.substring(0, 17)}...' : replyToContent}"
                         : postResultImages.isNotEmpty
-                        ? "Send image${postResultImages.length > 1
-                        ? '\'s'
-                        : ''}"
+                        ? "Send image${postResultImages.length > 1 ? 's' : ''}"
                         : "Type a message...",
-                    hintStyle: TextStyle(
+                    hintStyle: const TextStyle(
                       color: Colors.grey,
-                      fontSize: 12,
+                      fontSize: 14,
                     ),
                     suffixIcon: IconButton(
-                      onPressed: () =>
-                          _showEmojiBottomSheet(
-                            context: context,
-                            onEmojiSelected: (category, emoji) {
-                              messageController.text = emoji.emoji;
-                            },
-                            onBackspacePressed: () {},
-                          ),
-                      icon: Icon(
+                      onPressed: () => _showEmojiBottomSheet(
+                        context: context,
+                        onEmojiSelected: (category, emoji) {
+                          messageController.text += emoji.emoji; // Append emoji instead of replacing
+                        },
+                        onBackspacePressed: () {},
+                      ),
+                      icon: const Icon(
                         Icons.emoji_emotions_outlined,
                         color: Colors.grey,
                       ),
                     ),
                   ),
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                   onFieldSubmitted: (_) => onSendMessage(),

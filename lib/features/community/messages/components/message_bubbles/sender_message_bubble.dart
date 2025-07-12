@@ -1,10 +1,11 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:sufcart_app/features/community/messages/components/image_message_bubble.dart';
+import 'package:sufcart_app/features/community/messages/components/message_bubbles/image_message_bubble.dart';
 import 'package:sufcart_app/features/community/posts/screen/image_view_screen.dart';
 import 'package:sufcart_app/utilities/constants/app_colors.dart';
 
@@ -34,7 +35,7 @@ class SenderMessageBubble extends StatefulWidget {
   });
 
   @override
-  _SenderMessageBubbleState createState() => _SenderMessageBubbleState();
+  State<SenderMessageBubble> createState() => _SenderMessageBubbleState();
 }
 
 class _SenderMessageBubbleState extends State<SenderMessageBubble>
@@ -44,6 +45,38 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
   late Animation<double> _slideAnimation;
   double _dragOffset = 0.0;
   bool _isSwiping = false;
+
+  void _copyToClipboard(String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        content: Container(
+          height: 40,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+              color: Colors.black, borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Message copied to clipboard",
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -126,7 +159,7 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
             child: const Text("Delete"),
           ),
           CupertinoContextMenuAction(
-            trailingIcon: CupertinoIcons.heart_fill,
+            trailingIcon: CupertinoIcons.heart,
             onPressed: () => _showEmojiBottomSheet(
               context: context,
               onEmojiSelected: (category, emoji) {
@@ -138,9 +171,12 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
             child: const Text("React"),
           ),
           CupertinoContextMenuAction(
-            trailingIcon: CupertinoIcons.share,
-            onPressed: (){},
-            child: const Text("Share"),
+            trailingIcon: Icons.copy,
+            onPressed: () {
+              _copyToClipboard(widget.messagesModel.content);
+              Navigator.pop(context);
+            },
+            child: const Text("Copy"),
           ),
         ],
         child: Material(
@@ -196,7 +232,7 @@ class _SenderMessageBubbleState extends State<SenderMessageBubble>
                                   (widget.messagesModel.images.isNotEmpty)
                                       ? Colors.grey.withOpacity(0.0)
                                       : Colors.grey.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(40),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: IntrinsicWidth(
                                   child: Container(

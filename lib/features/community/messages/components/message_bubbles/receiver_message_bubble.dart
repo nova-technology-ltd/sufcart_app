@@ -10,7 +10,7 @@ import '../../../../profile/model/user_model.dart';
 import '../../../posts/screen/image_view_screen.dart';
 import '../../../repost/components/emoji_bottom_sheet.dart';
 import '../../data/model/messages_model.dart';
-import '../image_message_bubble.dart';
+import 'image_message_bubble.dart';
 
 class ReceiverMessageBubble extends StatefulWidget {
   final bool isDarkMode;
@@ -188,7 +188,7 @@ class _ReceiverMessageBubbleState extends State<ReceiverMessageBubble>
                                     color: (widget.messagesModel.images.isNotEmpty)
                                         ? Colors.grey.withOpacity(0.0)
                                         : Colors.grey.withOpacity(0.08),
-                                    borderRadius: BorderRadius.circular(40),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: IntrinsicWidth(
                                     child: Container(

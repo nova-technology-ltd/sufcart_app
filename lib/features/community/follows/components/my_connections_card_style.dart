@@ -94,6 +94,7 @@ class MyConnectionsCardStyle extends StatelessWidget {
             Container(
               height: 32,
               width: 80,
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 color: Color(AppColors.primaryColor).withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
