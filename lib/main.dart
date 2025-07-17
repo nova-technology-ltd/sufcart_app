@@ -20,7 +20,16 @@ import 'state_management/shared_preference_services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase
-  await Firebase.initializeApp(); // Add this line
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyCZ80mbmdq4HT-bpL9pcv3m9aTA9RuOruU",
+      projectId: 'uconnect-1d569',
+      authDomain: 'uconnect-1d569.firebaseapp.com',
+      storageBucket: 'uconnect-1d569.appspot.com',
+      messagingSenderId: '314503984341',
+      appId: '1:314503984341:web:83c9cff17c072731a71e5c',
+    ),
+  );
   final sharedPreferencesService = await SharedPreferencesService.getInstance();
   final PushNotificationService notificationService = PushNotificationService();
   runApp(
@@ -86,7 +95,8 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.getTheme(),
           darkTheme: ThemeData.dark(),
           themeMode: ThemeMode.system,
-          home: const MyConnectionWelcomeScreen(),
+          // home: const MyConnectionWelcomeScreen(),
+          home: const SplashScreen(),
         ),
       ),
     );

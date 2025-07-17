@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sufcart_app/features/notification/model/push_notification_model.dart';
+import 'package:sufcart_app/utilities/components/show_snack_bar.dart';
 import '../../../utilities/constants/app_strings.dart';
 
 class PushNotificationService {
@@ -221,5 +223,27 @@ class PushNotificationService {
   static Future<void> unsubscribeFromTopic(String topic) async {
     await firebaseMessaging.unsubscribeFromTopic(topic);
     print('Unsubscribed from topic: $topic');
+  }
+  
+  
+  Future<List<PushNotificationModel>> getUserDevices (BuildContext context) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("Authorization");
+      final response = await http.get(Uri.parse("$baseUrl/api/v1/org/push-notifications/user-devices"), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      });
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        final List<dynamic> devices = responseData['data'];
+        return devices.map((device) => PushNotificationModel.fromMap(device)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
+    }
+    return [];
   }
 }
