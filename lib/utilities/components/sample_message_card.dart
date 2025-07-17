@@ -1,5 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sufcart_app/utilities/constants/app_colors.dart';
+
+import '../themes/theme_provider.dart';
 
 class SampleMessageCard extends StatelessWidget {
   final String name;
@@ -11,13 +15,14 @@ class SampleMessageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 0.01),
       child: Container(
         height: 55,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.8),
+            color: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white.withOpacity(0.8),
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(

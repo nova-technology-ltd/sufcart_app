@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/features/notification/service/notification_service.dart';
+import 'package:sufcart_app/utilities/components/custom_button_one.dart';
 import '../../../state_management/shared_preference_provider.dart';
 import '../../../utilities/components/app_bar_back_arrow.dart';
 import '../../../utilities/components/custom_check_bok.dart';
@@ -52,6 +54,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   final SettingsServices _settingsServices = SettingsServices();
+  final NotificationService _notificationService = NotificationService();
+
+  Future<void> _registerNotification(BuildContext context) async {
+    try {
+
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   void initState() {
@@ -300,17 +311,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                     ),
-                    // SettingsOptionCard(
-                    //   icon: Icons.add_location_alt_sharp,
-                    //   title: "Billing Address",
-                    //   onClick: () {
-                    //     Navigator.of(context).push(
-                    //       MaterialPageRoute(
-                    //         builder: (context) => const BillingAddressScreen(),
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2.5),
                       child: Container(
@@ -534,28 +534,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: Colors.grey,
                       ),
                     ),
-                    // SettingsOptionCard(
-                    //   icon: Icons.money,
-                    //   title: "Payment Method",
-                    //   onClick: () {
-                    //     Navigator.of(context).push(
-                    //       MaterialPageRoute(
-                    //         builder: (context) => const PaymentMethodScreen(),
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
-                    // SettingsOptionCard(
-                    //   icon: Icons.history,
-                    //   title: "Search History",
-                    //   onClick: () {
-                    //     Navigator.of(context).push(
-                    //       MaterialPageRoute(
-                    //         builder: (context) => const SearchHistoryScreen(),
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
                     SettingsOptionCard(
                       icon: Icons.scale_rounded,
                       title: "Terms & Condition",
@@ -568,86 +546,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
                     const SizedBox(height: 10),
-                    // Container(
-                    //   width: MediaQuery.of(context).size.width,
-                    //   decoration: BoxDecoration(
-                    //     color: Colors.grey.withOpacity(0.05),
-                    //     borderRadius: BorderRadius.circular(8),
-                    //   ),
-                    //   child: Padding(
-                    //     padding: const EdgeInsets.symmetric(
-                    //       vertical: 5.0,
-                    //     ),
-                    //     child: Row(
-                    //       crossAxisAlignment: CrossAxisAlignment.center,
-                    //       children: [
-                    //         Container(
-                    //           height: 25,
-                    //           width: 25,
-                    //           decoration: BoxDecoration(
-                    //             color: const Color(
-                    //               AppColors.primaryColor,
-                    //             ).withOpacity(0.2),
-                    //             shape: BoxShape.circle,
-                    //           ),
-                    //           child: Center(
-                    //             child: SizedBox(
-                    //               height: 15,
-                    //               child: Icon(Icons.money, size: 14, color: Color(AppColors.primaryColor)),
-                    //             ),
-                    //           ),
-                    //         ),
-                    //         const SizedBox(width: 5),
-                    //         Text(
-                    //           "Currency",
-                    //           style: TextStyle(
-                    //             fontSize: 12,
-                    //             color:
-                    //             themeProvider.isDarkMode
-                    //                 ? null
-                    //                 : Colors.black,
-                    //           ),
-                    //         ),
-                    //         const SizedBox(width: 5),
-                    //         Container(
-                    //           decoration: BoxDecoration(
-                    //               color: themeProvider.isDarkMode ? Colors.grey.withOpacity(0.3) : Colors.grey[300],
-                    //               borderRadius: BorderRadius.circular(360)
-                    //           ),
-                    //           child: !themeProvider.isDarkMode ? Padding(
-                    //             padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5),
-                    //             child: RichText(text: TextSpan(
-                    //                 children: [
-                    //                   TextSpan(
-                    //                       text: "Default: ",
-                    //                       style: TextStyle(
-                    //                           fontSize: 8,
-                    //                           fontWeight: FontWeight.bold,
-                    //                           color: Colors.black
-                    //                       )
-                    //                   ),
-                    //                   TextSpan(
-                    //                       text: "NGN",
-                    //                       style: TextStyle(
-                    //                           fontSize: 8,
-                    //                           color: Colors.black
-                    //                       )
-                    //                   ),
-                    //                 ]
-                    //             )),
-                    //           ) : Padding(
-                    //             padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3),
-                    //             child: Text("Dark", style: TextStyle(
-                    //               fontSize: 8,
-                    //               fontWeight: FontWeight.bold,
-                    //             ),),
-                    //           ),
-                    //         )
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 5),
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
@@ -1046,184 +944,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       title: "Logout",
                       onClick: () => logUserOut(context),
                     ),
-                    // const SizedBox(height: 20),
-                    //onboarding_img_ten.png
-                    // user.isVendor
-                    //     ? const SizedBox.shrink()
-                    //     : Column(
-                    //       crossAxisAlignment: CrossAxisAlignment.start,
-                    //       children: [
-                    //         RichText(
-                    //           text: const TextSpan(
-                    //             children: [
-                    //               TextSpan(
-                    //                 text: "Vendor ",
-                    //                 style: TextStyle(
-                    //                   color: Color(AppColors.primaryColor),
-                    //                   fontSize: 12,
-                    //                   fontWeight: FontWeight.w400,
-                    //                 ),
-                    //               ),
-                    //               TextSpan(
-                    //                 text: "Application",
-                    //                 style: TextStyle(
-                    //                   color: Colors.grey,
-                    //                   fontSize: 12,
-                    //                   fontWeight: FontWeight.w400,
-                    //                 ),
-                    //               ),
-                    //             ],
-                    //           ),
-                    //         ),
-                    //         const SizedBox(height: 5),
-                    //         Container(
-                    //           height: 105,
-                    //           width: MediaQuery.of(context).size.width,
-                    //           decoration: BoxDecoration(
-                    //             color: Colors.grey.withOpacity(0.05),
-                    //             borderRadius: BorderRadius.circular(20),
-                    //           ),
-                    //           child: Padding(
-                    //             padding: const EdgeInsets.symmetric(
-                    //               horizontal: 10.0,
-                    //               vertical: 8,
-                    //             ),
-                    //             child: Row(
-                    //               children: [
-                    //                 Expanded(
-                    //                   flex: 8,
-                    //                   child: SizedBox(
-                    //                     child: Column(
-                    //                       crossAxisAlignment:
-                    //                           CrossAxisAlignment.start,
-                    //                       children: [
-                    //                         RichText(
-                    //                           text: const TextSpan(
-                    //                             children: [
-                    //                               TextSpan(
-                    //                                 text: "Become a verified ",
-                    //                                 style: TextStyle(
-                    //                                   color: Colors.black,
-                    //                                   fontSize: 15,
-                    //                                   fontWeight:
-                    //                                       FontWeight.w400,
-                    //                                 ),
-                    //                               ),
-                    //                               TextSpan(
-                    //                                 text:
-                    //                                     AppStrings.appNameText,
-                    //                                 style: TextStyle(
-                    //                                   color: Color(
-                    //                                     AppColors.primaryColor,
-                    //                                   ),
-                    //                                   fontSize: 15,
-                    //                                   fontWeight:
-                    //                                       FontWeight.w400,
-                    //                                 ),
-                    //                               ),
-                    //                               TextSpan(
-                    //                                 text: " vendor",
-                    //                                 style: TextStyle(
-                    //                                   color: Colors.black,
-                    //                                   fontSize: 15,
-                    //                                   fontWeight:
-                    //                                       FontWeight.w400,
-                    //                                 ),
-                    //                               ),
-                    //                             ],
-                    //                           ),
-                    //                         ),
-                    //                         const SizedBox(height: 5),
-                    //                         RichText(
-                    //                           text: const TextSpan(
-                    //                             children: [
-                    //                               TextSpan(
-                    //                                 text:
-                    //                                     "How would it feel to know you can get your ",
-                    //                                 style: TextStyle(
-                    //                                   color: Colors.grey,
-                    //                                   fontSize: 10,
-                    //                                   fontWeight:
-                    //                                       FontWeight.w400,
-                    //                                 ),
-                    //                               ),
-                    //                               TextSpan(
-                    //                                 text:
-                    //                                     AppStrings.appNameText,
-                    //                                 style: TextStyle(
-                    //                                   color: Color(
-                    //                                     AppColors.primaryColor,
-                    //                                   ),
-                    //                                   fontSize: 10,
-                    //                                   fontWeight:
-                    //                                       FontWeight.w400,
-                    //                                 ),
-                    //                               ),
-                    //                               TextSpan(
-                    //                                 text:
-                    //                                     " up and running in a matter of minutes? ",
-                    //                                 style: TextStyle(
-                    //                                   color: Colors.grey,
-                    //                                   fontSize: 10,
-                    //                                   fontWeight:
-                    //                                       FontWeight.w400,
-                    //                                 ),
-                    //                               ),
-                    //                             ],
-                    //                           ),
-                    //                         ),
-                    //                         const Spacer(),
-                    //                         GestureDetector(
-                    //                           onTap: () {
-                    //                             Navigator.of(context).push(
-                    //                               MaterialPageRoute(
-                    //                                 builder:
-                    //                                     (context) =>
-                    //                                         const StoreApplicationScreen(),
-                    //                               ),
-                    //                             );
-                    //                           },
-                    //                           child: Container(
-                    //                             height: 30,
-                    //                             width: 120,
-                    //                             decoration: BoxDecoration(
-                    //                               color: const Color(
-                    //                                 AppColors.primaryColor,
-                    //                               ).withOpacity(0.8),
-                    //                               borderRadius:
-                    //                                   BorderRadius.circular(12),
-                    //                             ),
-                    //                             child: const Center(
-                    //                               child: Text(
-                    //                                 "Apply Now",
-                    //                                 style: TextStyle(
-                    //                                   color: Colors.white,
-                    //                                   fontSize: 10,
-                    //                                   fontWeight:
-                    //                                       FontWeight.w800,
-                    //                                 ),
-                    //                               ),
-                    //                             ),
-                    //                           ),
-                    //                         ),
-                    //                       ],
-                    //                     ),
-                    //                   ),
-                    //                 ),
-                    //                 Expanded(
-                    //                   flex: 3,
-                    //                   child: SizedBox(
-                    //                     child: Image.asset(
-                    //                       "images/onboarding_img_ten.png",
-                    //                     ),
-                    //                   ),
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
+                    const SizedBox(height: 10),
+                    CustomButtonOne(title: "register device", onClick: (){}, isLoading: isLoading),
                     const SizedBox(height: 50),
                   ],
                 ),
