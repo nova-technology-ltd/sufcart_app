@@ -14,7 +14,7 @@ class PostModel {
   final List<LikesModel> likes;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final UserModel? userDetails;
+  final UserModel userDetails;
 
   PostModel({
     required this.postID,
@@ -26,7 +26,7 @@ class PostModel {
     required this.likes,
     required this.createdAt,
     required this.updatedAt,
-    this.userDetails,
+    required this.userDetails,
   });
 
   factory PostModel.fromMap(Map<String, dynamic> map) {
@@ -64,7 +64,7 @@ class PostModel {
       'likes': likes.map((like) => like.toMap()).toList(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
-      'userDetails': userDetails?.toMap(),
+      'userDetails': userDetails.toMap(),
     };
   }
 }

@@ -29,11 +29,29 @@ class FollowsServices {
     return [];
   }
 
-  Future<List<UserModel>> getConnections(BuildContext context) async {
+  Future<List<UserModel>> getMyConnections(BuildContext context) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("Authorization");
       final response = await http.get(Uri.parse("$baseUrl/api/v1/org/community/follows/user/connections"), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      });
+      print(response.body);
+      final responseData = jsonDecode(response.body);
+      final List<dynamic> followingsData = responseData['data'];
+      final List<UserModel> followings = followingsData.map((data) => UserModel.fromMap(data)).toList();
+      return followings;
+    } catch (e) {
+      showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
+    }
+    return[];
+  }
+  Future<List<UserModel>> getUserConnections(BuildContext context, String userID) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("Authorization");
+      final response = await http.get(Uri.parse("$baseUrl/api/v1/org/community/follows/user/connections/$userID"), headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token"
       });

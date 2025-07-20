@@ -24,7 +24,7 @@ class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
 
   @override
   void initState() {
-    _futureConnections = _followsServices.getConnections(context);
+    _futureConnections = _followsServices.getMyConnections(context);
     super.initState();
   }
 

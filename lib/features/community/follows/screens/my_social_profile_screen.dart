@@ -52,7 +52,7 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
         context,
         user.userID,
       );
-      _futureConnections = _followsServices.getConnections(context);
+      _futureConnections = _followsServices.getMyConnections(context);
     });
   }
 
@@ -77,7 +77,7 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
       context,
       user.userID,
     );
-    _futureConnections = _followsServices.getConnections(context);
+    _futureConnections = _followsServices.getMyConnections(context);
     super.initState();
   }
 
