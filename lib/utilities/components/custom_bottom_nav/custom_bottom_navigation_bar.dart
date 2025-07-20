@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/features/community/follows/screens/my_social_profile_screen.dart';
 import '../../../features/community/follows/screens/users_screen.dart';
 import '../../../features/community/messages/data/provider/messages_socket_provider.dart';
 import '../../../features/community/messages/presentations/screens/talks_screen.dart';
@@ -31,7 +32,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     const TalksScreen(),
     const NotificationScreens(),
     const UsersScreen(),
-    const ProfileScreen(),
+    const MySocialProfileScreen(),
   ];
   int currentScreen = 0;
 

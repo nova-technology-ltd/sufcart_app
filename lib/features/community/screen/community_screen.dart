@@ -142,7 +142,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => MySocialProfileScreen(user: user,),
+                    builder: (context) => ProfileScreen(),
                   ),
                 );
               },

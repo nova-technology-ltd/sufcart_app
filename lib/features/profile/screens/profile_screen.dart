@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sufcart_app/features/profile/screens/write_us_a_review_screen.dart';
 
+import '../../../utilities/components/app_bar_back_arrow.dart';
 import '../../../utilities/components/custom_loader.dart';
 import '../../../utilities/components/show_snack_bar.dart';
 import '../../../utilities/constants/app_colors.dart';
@@ -97,9 +98,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 centerTitle: true,
                 automaticallyImplyLeading: false,
-                // leading: AppBarBackArrow(onClick: () {
-                //   Navigator.pop(context);
-                // }),
+                leading: AppBarBackArrow(onClick: () {
+                  Navigator.pop(context);
+                }),
                 actions: [
                   IconButton(
                     onPressed: () {

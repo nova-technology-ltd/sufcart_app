@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sufcart_app/features/community/follows/components/user_connections_card_one.dart';
 import 'package:sufcart_app/features/community/follows/screens/user_followers_and_followings_screen.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
+import 'package:sufcart_app/features/profile/screens/profile_screen.dart';
 import 'package:sufcart_app/features/settings/account_settings/screens/profile_settings.dart';
 import 'package:sufcart_app/utilities/components/app_bar_back_arrow.dart';
 import 'package:sufcart_app/utilities/components/read_more_text.dart';
@@ -21,9 +22,7 @@ import '../section/profile_repost_section.dart';
 import '../services/follows_services.dart';
 
 class MySocialProfileScreen extends StatefulWidget {
-  final UserModel user;
-
-  const MySocialProfileScreen({super.key, required this.user});
+  const MySocialProfileScreen({super.key});
 
   @override
   State<MySocialProfileScreen> createState() => _MySocialProfileScreenState();
@@ -42,15 +41,16 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
 
   // Function to refresh posts
   Future<void> _refreshScreen() async {
+    final user = Provider.of<UserProvider>(context, listen: false).userModel;
     setState(() {
-      _futurePosts = _postServices.postsByUser(context, widget.user.userID);
+      _futurePosts = _postServices.postsByUser(context, user.userID);
       _futureReposts = _repostService.repostsByUser(
         context,
-        widget.user.userID,
+        user.userID,
       );
       _futureAnalytics = _followsServices.userProfileAnalytics(
         context,
-        widget.user.userID,
+        user.userID,
       );
       _futureConnections = _followsServices.getConnections(context);
     });
@@ -69,12 +69,13 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
 
   @override
   void initState() {
+    final user = Provider.of<UserProvider>(context, listen: false).userModel;
     _tabController = TabController(length: 2, vsync: this);
-    _futurePosts = _postServices.postsByUser(context, widget.user.userID);
-    _futureReposts = _repostService.repostsByUser(context, widget.user.userID);
+    _futurePosts = _postServices.postsByUser(context, user.userID);
+    _futureReposts = _repostService.repostsByUser(context, user.userID);
     _futureAnalytics = _followsServices.userProfileAnalytics(
       context,
-      widget.user.userID,
+      user.userID,
     );
     _futureConnections = _followsServices.getConnections(context);
     super.initState();
@@ -100,51 +101,22 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                       ? Color(AppColors.primaryColorDarkMode)
                       : Colors.white,
               automaticallyImplyLeading: false,
-              leadingWidth: 90,
               centerTitle: true,
               title: Text(
                 user.userName.isNotEmpty ? user.userName : "Profile",
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-              leading: AppBarBackArrow(
-                onClick: () {
-                  Navigator.pop(context);
-                },
               ),
               actions: [
                 IconButton(
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const SettingsScreen(),
+                        builder: (context) => const ProfileScreen(),
                       ),
                     );
                   },
-                  tooltip: "Settings",
-                  icon: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Stack(
-                      children: [
-                        Image.asset(
-                          "images/settings-outlined.png",
-                          color: isDarkMode ? Colors.grey : Colors.black,
-                        ),
-                        user.isEmailVerified
-                            ? const SizedBox.shrink()
-                            : Positioned(
-                              right: 0,
-                              child: Container(
-                                height: 10,
-                                width: 10,
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                      ],
-                    ),
-                  ),
+                  tooltip: "more",
+                  icon: Icon(Icons.menu, color: Colors.grey,),
                 ),
               ],
             ),
