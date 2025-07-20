@@ -13,6 +13,8 @@ class AppIcons {
   static const paintBrush = "images/paint-board-and-brush.png";
   static const sharePDFLogo = "images/share_pdf.png";
   static const shareImageLogo = "images/share_image.png";
+  static const googleOption = "images/signin_with_google.png";
+  static const emailOption = "images/email_icon.png";
 
   static const notificationSettingsIcons = "images/notification-bell.png";
   static const cartNotificationIcon = "images/cart.png";

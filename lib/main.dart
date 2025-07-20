@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:sufcart_app/features/community/repost/socket/repost_socket_provider.dart';
 import 'package:sufcart_app/features/notification/screens/enable_push_notification_screen.dart';
+import 'package:sufcart_app/features/welcome/screens/onboarding_screen.dart';
 import 'package:sufcart_app/state_management/shared_preference_provider.dart';
 import 'package:sufcart_app/utilities/socket/socket_config_provider.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
@@ -20,16 +21,7 @@ import 'state_management/shared_preference_services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyCZ80mbmdq4HT-bpL9pcv3m9aTA9RuOruU",
-      projectId: 'uconnect-1d569',
-      authDomain: 'uconnect-1d569.firebaseapp.com',
-      storageBucket: 'uconnect-1d569.appspot.com',
-      messagingSenderId: '314503984341',
-      appId: '1:314503984341:web:83c9cff17c072731a71e5c',
-    ),
-  );
+  await Firebase.initializeApp();
   final sharedPreferencesService = await SharedPreferencesService.getInstance();
   final PushNotificationService notificationService = PushNotificationService();
   runApp(
@@ -97,6 +89,7 @@ class MyApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           // home: const MyConnectionWelcomeScreen(),
           home: const SplashScreen(),
+          // home: const OnboardingScreen(),
         ),
       ),
     );

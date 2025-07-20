@@ -9,6 +9,8 @@ class CustomTextField extends StatelessWidget {
   final double? corner;
   final Color? bg;
   final Color? hintColor;
+  final OutlineInputBorder? outlineInputBorder;
+  final OutlineInputBorder? outlineFocusInputBorder;
   final Function(String)? onChange;
   final FormFieldSetter<String>? onSaved;
   final Function()? onTap;
@@ -34,7 +36,7 @@ class CustomTextField extends StatelessWidget {
     this.focusNode,
     this.maxLine,
     this.onSaved,
-    this.validator, this.hasBG, this.bg, this.hintColor,
+    this.validator, this.hasBG, this.bg, this.hintColor, this.outlineInputBorder, this.outlineFocusInputBorder,
   });
 
   @override
@@ -52,17 +54,17 @@ class CustomTextField extends StatelessWidget {
       readOnly: readOnly ?? false,
       validator: validator,
       decoration: InputDecoration(
-        border: OutlineInputBorder(
+        border: outlineInputBorder ?? OutlineInputBorder(
           borderRadius: BorderRadius.circular(corner ?? 10),
           borderSide: const BorderSide(color: Colors.transparent),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.transparent),
+        focusedBorder: outlineFocusInputBorder ?? OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.transparent),
           borderRadius: BorderRadius.circular(corner ?? 10),
         ),
-        enabledBorder: OutlineInputBorder(
+        enabledBorder: outlineInputBorder ?? OutlineInputBorder(
           borderRadius: BorderRadius.circular(corner ?? 10),
-          borderSide: const BorderSide(color: Colors.transparent),
+          borderSide: BorderSide(color: Colors.transparent),
         ),
         fillColor: bg ?? Colors.grey.withOpacity(0.08),
         filled: hasBG ?? true,

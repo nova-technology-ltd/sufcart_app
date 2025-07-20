@@ -246,4 +246,19 @@ class PushNotificationService {
     }
     return [];
   }
+
+  Future<int> removeDevice(BuildContext context, String customID) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("Authorization");
+      final response = await http.delete(Uri.parse("$baseUrl/api/v1/org/push-notifications/remove-device"), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      });
+      return response.statusCode;
+    } catch (e) {
+      showSnackBar(context: context, message: AppStrings.serverErrorMessage, title: "Server Error");
+    }
+    return -1;
+  }
 }

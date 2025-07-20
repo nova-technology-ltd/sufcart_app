@@ -8,12 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';
 
-import '../../../../../utilities/constants/app_colors.dart';
-import '../../../repost/components/emoji_bottom_sheet.dart';
-import '../../data/model/messages_model.dart';
-import '../../data/provider/messages_socket_provider.dart';
+import '../../../../../../utilities/themes/theme_provider.dart';
+import '../../../../repost/components/emoji_bottom_sheet.dart';
+import '../../../data/model/messages_model.dart';
+import '../../../data/provider/messages_socket_provider.dart';
 
-class SenderLinkMessageBubble extends StatefulWidget {
+class ReceiverMessageLinkBubble extends StatefulWidget {
   final bool isDarkMode;
   final Function(String) onReactionSelected;
   final Function(String, String) onReactionRemoved;
@@ -22,7 +22,7 @@ class SenderLinkMessageBubble extends StatefulWidget {
   final Function(String, String) onReply;
   final MessagesModel messagesModel;
 
-  const SenderLinkMessageBubble({
+  const ReceiverMessageLinkBubble({
     super.key,
     required this.isDarkMode,
     required this.onReactionSelected,
@@ -34,10 +34,10 @@ class SenderLinkMessageBubble extends StatefulWidget {
   });
 
   @override
-  State<SenderLinkMessageBubble> createState() => _SenderLinkMessageBubbleState();
+  State<ReceiverMessageLinkBubble> createState() => _ReceiverMessageLinkBubbleState();
 }
 
-class _SenderLinkMessageBubbleState extends State<SenderLinkMessageBubble> {
+class _ReceiverMessageLinkBubbleState extends State<ReceiverMessageLinkBubble> {
   bool _showTime = false;
   Metadata? _metadata;
   bool _isLoadingMetadata = false;
@@ -125,9 +125,10 @@ class _SenderLinkMessageBubbleState extends State<SenderLinkMessageBubble> {
   Widget build(BuildContext context) {
     final url = _extractUrl(widget.messagesModel.content);
     final finalLink = Uri.parse("$url");
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
 
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: Alignment.centerLeft,
       child: CupertinoContextMenu(
         actions: [
           CupertinoContextMenuAction(
@@ -188,16 +189,20 @@ class _SenderLinkMessageBubbleState extends State<SenderLinkMessageBubble> {
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     decoration: BoxDecoration(
-                      color: Color(AppColors.primaryColor),
+                      color: (widget.messagesModel.images.isNotEmpty)
+                          ? Colors.transparent
+                          : isDarkMode
+                          ? Colors.grey.withOpacity(0.3)
+                          : Colors.grey[200],
                       borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(20),
-                        topRight: widget.isFirstInGroup
+                        topLeft: widget.isFirstInGroup
                             ? const Radius.circular(20)
                             : const Radius.circular(4),
-                        bottomLeft: const Radius.circular(20),
-                        bottomRight: widget.isLastInGroup
+                        topRight: const Radius.circular(20),
+                        bottomLeft: widget.isLastInGroup
                             ? const Radius.circular(20)
                             : const Radius.circular(4),
+                        bottomRight: const Radius.circular(20),
                       ),
                     ),
                     child: Column(

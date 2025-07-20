@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:iconly/iconly.dart';
-import 'package:sufcart_app/features/community/messages/components/message_bubbles/receiver_message_link_bubble.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
+import '../../../../profile/model/user_model.dart';
+import '../../data/model/messages_model.dart';
+import '../../data/provider/messages_socket_provider.dart';
+import '../../utilities/helpers.dart';
 import '../components/typing_indicator.dart';
-import '../../../profile/model/user_model.dart';
-import '../data/model/messages_model.dart';
 import 'package:provider/provider.dart';
-import '../data/provider/messages_socket_provider.dart';
-import '../utilities/helpers.dart';
 import 'message_bubbles/receiver_message_bubble.dart';
+import 'message_bubbles/receiver_message_link_bubble.dart';
 import 'message_bubbles/sender_message_bubble.dart';
 import 'message_bubbles/sender_link_message_bubble.dart';
 

@@ -5,14 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:sufcart_app/features/community/messages/components/message_bubbles/image_message_bubble.dart';
 import 'package:sufcart_app/features/community/posts/screen/image_view_screen.dart';
 import 'package:sufcart_app/utilities/constants/app_colors.dart';
-
-import '../../../../../utilities/constants/app_icons.dart';
-import '../../../repost/components/emoji_bottom_sheet.dart';
-import '../../data/model/messages_model.dart';
-import '../../data/provider/messages_socket_provider.dart';
+import '../../../../repost/components/emoji_bottom_sheet.dart';
+import '../../../data/model/messages_model.dart';
+import '../../../data/provider/messages_socket_provider.dart';
+import 'image_message_bubble.dart';
 
 class SenderMessageBubble extends StatefulWidget {
   final bool isDarkMode;

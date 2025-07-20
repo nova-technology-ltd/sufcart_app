@@ -5,11 +5,10 @@ import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
-import '../../../../../utilities/constants/app_icons.dart';
-import '../../../../profile/model/user_model.dart';
-import '../../../posts/screen/image_view_screen.dart';
-import '../../../repost/components/emoji_bottom_sheet.dart';
-import '../../data/model/messages_model.dart';
+import '../../../../../profile/model/user_model.dart';
+import '../../../../posts/screen/image_view_screen.dart';
+import '../../../../repost/components/emoji_bottom_sheet.dart';
+import '../../../data/model/messages_model.dart';
 import 'image_message_bubble.dart';
 
 class ReceiverMessageBubble extends StatefulWidget {

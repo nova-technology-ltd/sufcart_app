@@ -944,8 +944,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       title: "Logout",
                       onClick: () => logUserOut(context),
                     ),
-                    const SizedBox(height: 10),
-                    CustomButtonOne(title: "register device", onClick: (){}, isLoading: isLoading),
                     const SizedBox(height: 50),
                   ],
                 ),

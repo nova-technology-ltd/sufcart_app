@@ -4,10 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:sufcart_app/features/community/follows/screens/user_profile_screen.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
-import '../../../../utilities/constants/app_colors.dart';
-import '../../../profile/model/user_model.dart';
-import '../data/provider/messages_socket_provider.dart';
-import '../utilities/helpers.dart';
+
+import '../../../../../utilities/constants/app_colors.dart';
+import '../../../../profile/model/user_model.dart';
+import '../../data/provider/messages_socket_provider.dart';
+import '../../utilities/helpers.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final UserModel receiver;

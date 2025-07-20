@@ -8,13 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';
 
-import '../../../../../utilities/constants/app_colors.dart';
-import '../../../../../utilities/themes/theme_provider.dart';
-import '../../../repost/components/emoji_bottom_sheet.dart';
-import '../../data/model/messages_model.dart';
-import '../../data/provider/messages_socket_provider.dart';
+import '../../../../../../utilities/constants/app_colors.dart';
+import '../../../../repost/components/emoji_bottom_sheet.dart';
+import '../../../data/model/messages_model.dart';
+import '../../../data/provider/messages_socket_provider.dart';
 
-class ReceiverMessageLinkBubble extends StatefulWidget {
+class SenderLinkMessageBubble extends StatefulWidget {
   final bool isDarkMode;
   final Function(String) onReactionSelected;
   final Function(String, String) onReactionRemoved;
@@ -23,7 +22,7 @@ class ReceiverMessageLinkBubble extends StatefulWidget {
   final Function(String, String) onReply;
   final MessagesModel messagesModel;
 
-  const ReceiverMessageLinkBubble({
+  const SenderLinkMessageBubble({
     super.key,
     required this.isDarkMode,
     required this.onReactionSelected,
@@ -35,10 +34,10 @@ class ReceiverMessageLinkBubble extends StatefulWidget {
   });
 
   @override
-  State<ReceiverMessageLinkBubble> createState() => _ReceiverMessageLinkBubbleState();
+  State<SenderLinkMessageBubble> createState() => _SenderLinkMessageBubbleState();
 }
 
-class _ReceiverMessageLinkBubbleState extends State<ReceiverMessageLinkBubble> {
+class _SenderLinkMessageBubbleState extends State<SenderLinkMessageBubble> {
   bool _showTime = false;
   Metadata? _metadata;
   bool _isLoadingMetadata = false;
@@ -126,10 +125,9 @@ class _ReceiverMessageLinkBubbleState extends State<ReceiverMessageLinkBubble> {
   Widget build(BuildContext context) {
     final url = _extractUrl(widget.messagesModel.content);
     final finalLink = Uri.parse("$url");
-    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
 
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.centerRight,
       child: CupertinoContextMenu(
         actions: [
           CupertinoContextMenuAction(
@@ -190,20 +188,16 @@ class _ReceiverMessageLinkBubbleState extends State<ReceiverMessageLinkBubble> {
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     decoration: BoxDecoration(
-                      color: (widget.messagesModel.images.isNotEmpty)
-                          ? Colors.transparent
-                          : isDarkMode
-                          ? Colors.grey.withOpacity(0.3)
-                          : Colors.grey[200],
+                      color: Color(AppColors.primaryColor),
                       borderRadius: BorderRadius.only(
-                        topLeft: widget.isFirstInGroup
+                        topLeft: const Radius.circular(20),
+                        topRight: widget.isFirstInGroup
                             ? const Radius.circular(20)
                             : const Radius.circular(4),
-                        topRight: const Radius.circular(20),
-                        bottomLeft: widget.isLastInGroup
+                        bottomLeft: const Radius.circular(20),
+                        bottomRight: widget.isLastInGroup
                             ? const Radius.circular(20)
                             : const Radius.circular(4),
-                        bottomRight: const Radius.circular(20),
                       ),
                     ),
                     child: Column(

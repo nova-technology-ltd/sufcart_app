@@ -2,15 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../../../../utilities/components/cloudinary_eervices.dart';
-import '../../../../utilities/themes/theme_provider.dart';
-import '../../../profile/model/user_model.dart';
+import '../../../../../utilities/components/cloudinary_eervices.dart';
+import '../../../../../utilities/themes/theme_provider.dart';
+import '../../../../profile/model/user_model.dart';
+import '../../data/provider/messages_socket_provider.dart';
+import '../../utilities/helpers.dart';
 import '../components/chat_app_bar.dart';
 import '../components/message_input.dart';
 import '../components/message_list.dart';
 import '../components/reply_widget.dart';
-import '../data/provider/messages_socket_provider.dart';
-import '../utilities/helpers.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserModel receiver;

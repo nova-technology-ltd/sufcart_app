@@ -428,6 +428,7 @@ class _UsersCardStyleState extends State<UsersCardStyle> {
     final displayedUser = widget.data;
     final currentUserId = currentUser.userID;
     final displayedUserId = displayedUser.userID.toString();
+    final userFullName = "${widget.data.firstName} ${widget.data.lastName} ${widget.data.otherNames}";
 
     return Consumer3<
         LikeSocketProvider,
@@ -537,7 +538,7 @@ class _UsersCardStyleState extends State<UsersCardStyle> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "${widget.data.firstName} ${widget.data.lastName} ${widget.data.otherNames}",
+                        userFullName.length > 25 ? "${userFullName.substring(0, 25)}..." : userFullName,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w400,

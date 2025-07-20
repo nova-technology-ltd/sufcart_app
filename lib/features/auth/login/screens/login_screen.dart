@@ -85,50 +85,72 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  CustomTextField(
-                    hintText: "Email",
-                    prefixIcon: SizedBox(
-                        height: 10,
-                        width: 10,
-                        child: Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Image.asset(
-                            "images/messages-outlined.png",
-                            color: Colors.grey,
-                          ),
-                        )),
-                    controller: emailController,
-                    isObscure: false,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Email",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey
+                        ),
+                      ),
+                      CustomTextField(
+                        hintText: "e.g johndoe@gmail.com",
+                        prefixIcon: null,
+                        controller: emailController,
+                        isObscure: false,
+                        outlineInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                        ),
+                        outlineFocusInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(
-                    height: 15,
+                    height: 10,
                   ),
-                  CustomTextField(
-                    hintText: "Password",
-                    prefixIcon: SizedBox(
-                        height: 10,
-                        width: 10,
-                        child: Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Image.asset(
-                            "images/lock-outlined.png",
-                            color: Colors.grey,
-                          ),
-                        )),
-                    controller: passwordController,
-                    isObscure: isEyeClicked ? true : false,
-                    suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            isEyeClicked = !isEyeClicked;
-                          });
-                        },
-                      icon: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: Image.asset( isEyeClicked ? AppIcons.eyeCloseIcon: AppIcons.eyeOpenIcon, color: Colors.grey,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Password",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey
+                        ),
                       ),
-                    ),
+                      CustomTextField(
+                        hintText: "e.g *********",
+                        prefixIcon: null,
+                        outlineInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                        ),
+                        outlineFocusInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                        ),
+                        controller: passwordController,
+                        isObscure: isEyeClicked ? true : false,
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isEyeClicked = !isEyeClicked;
+                              });
+                            },
+                          icon: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: Image.asset( isEyeClicked ? AppIcons.eyeCloseIcon: AppIcons.eyeOpenIcon, color: Colors.grey,),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   isLoading ? const SizedBox.shrink(): Align(
                     alignment: Alignment.bottomRight,

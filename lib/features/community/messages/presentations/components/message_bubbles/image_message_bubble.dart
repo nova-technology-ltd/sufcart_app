@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../utilities/constants/app_icons.dart';
+import '../../../../../../utilities/constants/app_icons.dart';
+
 
 class ImageMessageBubble extends StatelessWidget {
   final List<String> urls;

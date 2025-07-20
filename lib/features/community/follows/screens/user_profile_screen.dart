@@ -18,7 +18,7 @@ import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 import '../../../auth/service/auth_service.dart';
 import '../../../profile/model/user_provider.dart';
 import '../../likes/socket/like_socket_provider.dart';
-import '../../messages/screens/chat_screen.dart';
+import '../../messages/presentations/screens/chat_screen.dart';
 import '../../reactions/socket/reaction_socket_provider.dart';
 import '../model/follow_model.dart';
 import '../socket/follows_socket_provider.dart';

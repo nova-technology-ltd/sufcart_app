@@ -1,206 +1,8 @@
-// import 'dart:io';
-//
-// import 'package:flutter/material.dart';
-// import 'package:device_info_plus/device_info_plus.dart';
-// import 'package:sufcart_app/features/notification/service/push_notification_service.dart';
-// import 'package:sufcart_app/utilities/components/custom_button_one.dart';
-// import 'package:uuid/uuid.dart';
-//
-// class EnablePushNotificationScreen extends StatefulWidget {
-//   const EnablePushNotificationScreen({super.key});
-//
-//   @override
-//   State<EnablePushNotificationScreen> createState() =>
-//       _EnablePushNotificationScreenState();
-// }
-//
-// class _EnablePushNotificationScreenState
-//     extends State<EnablePushNotificationScreen> {
-//   final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
-//   bool _isLoading = false;
-//   String? _deviceId;
-//   String? _fcmToken;
-//   String? _errorMessage;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _initialize();
-//   }
-//
-//   Future<void> _initialize() async {
-//     try {
-//       setState(() => _isLoading = true);
-//       await PushNotificationService.initialize();
-//       await _getDeviceInfo();
-//       await _getFCMToken();
-//     } catch (e) {
-//       setState(() => _errorMessage = e.toString());
-//     } finally {
-//       setState(() => _isLoading = false);
-//     }
-//   }
-//
-//   Future<void> _getDeviceInfo() async {
-//     try {
-//       String deviceId;
-//
-//       if (Platform.isAndroid) {
-//         final androidInfo = await _deviceInfoPlugin.androidInfo;
-//         deviceId = androidInfo.id;
-//       } else if (Platform.isIOS) {
-//         final iosInfo = await _deviceInfoPlugin.iosInfo;
-//         deviceId = iosInfo.identifierForVendor ?? const Uuid().v4();
-//       } else {
-//         deviceId = const Uuid().v4();
-//       }
-//
-//       setState(() => _deviceId = deviceId);
-//     } catch (e) {
-//       print('Error getting device info: $e');
-//       setState(() => _errorMessage = 'Failed to get device information');
-//     }
-//   }
-//
-//   Future<void> _getFCMToken() async {
-//     try {
-//       final token = await PushNotificationService.firebaseMessaging.getToken();
-//       if (token == null) throw Exception('Failed to get FCM token');
-//       setState(() => _fcmToken = token);
-//     } catch (e) {
-//       print('Error getting FCM token: $e');
-//       setState(() => _errorMessage = 'Failed to get notification token');
-//     }
-//   }
-//
-//   Future<void> _registerDevice() async {
-//     try {
-//       if (_deviceId == null || _fcmToken == null) {
-//         throw Exception('Device information not available');
-//       }
-//
-//       setState(() {
-//         _isLoading = true;
-//         _errorMessage = null;
-//       });
-//
-//       await PushNotificationService().registerDevice(
-//         context: context,
-//         deviceId: _deviceId!,
-//         token: _fcmToken!,
-//       );
-//
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('Notifications enabled successfully!')),
-//       );
-//     } catch (e) {
-//       print('Error registering device: $e');
-//       setState(() => _errorMessage = e.toString());
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Failed to enable notifications: ${e.toString()}')),
-//       );
-//     } finally {
-//       setState(() => _isLoading = false);
-//     }
-//   }
-//
-//   Future<void> _sendTestNotification() async {
-//     try {
-//       setState(() {
-//         _isLoading = true;
-//         _errorMessage = null;
-//       });
-//
-//       await PushNotificationService().sendTestNotification(
-//         context: context,
-//         title: "Test Notification",
-//         body: "This is a test notification from your app!",
-//         data: {'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
-//       );
-//
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('Test notification sent!')),
-//       );
-//     } catch (e) {
-//       print('Error sending test notification: $e');
-//       setState(() => _errorMessage = e.toString());
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Failed to send test: ${e.toString()}')),
-//       );
-//     } finally {
-//       setState(() => _isLoading = false);
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Enable Notifications'),
-//         centerTitle: true,
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(20.0),
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             if (_isLoading) ...[
-//               const CircularProgressIndicator(),
-//               const SizedBox(height: 20),
-//               const Text('Setting up notifications...'),
-//             ] else if (_errorMessage != null) ...[
-//               Icon(Icons.error_outline, color: Colors.red, size: 50),
-//               const SizedBox(height: 20),
-//               Text(
-//                 _errorMessage!,
-//                 style: TextStyle(color: Colors.red),
-//                 textAlign: TextAlign.center,
-//               ),
-//               const SizedBox(height: 20),
-//               ElevatedButton(
-//                 onPressed: _initialize,
-//                 child: const Text('Try Again'),
-//               ),
-//             ] else ...[
-//               const Icon(Icons.notifications_active, size: 50),
-//               const SizedBox(height: 20),
-//               const Text(
-//                 'Stay updated with important information',
-//                 style: TextStyle(fontSize: 18),
-//                 textAlign: TextAlign.center,
-//               ),
-//               const SizedBox(height: 30),
-//               CustomButtonOne(
-//                 title: "Enable Notifications",
-//                 onClick: _registerDevice,
-//                 isLoading: _isLoading,
-//               ),
-//               const SizedBox(height: 15),
-//               CustomButtonOne(
-//                 title: "Send Test Notification",
-//                 onClick: _sendTestNotification,
-//                 isLoading: _isLoading,
-//               ),
-//               if (_deviceId != null || _fcmToken != null) ...[
-//                 const SizedBox(height: 30),
-//                 const Text('Debug Information:', style: TextStyle(fontSize: 12)),
-//                 if (_deviceId != null)
-//                   Text('Device ID: ${_deviceId!.substring(0, 8)}...', style: const TextStyle(fontSize: 10)),
-//                 if (_fcmToken != null)
-//                   Text('FCM Token: ${_fcmToken!.substring(0, 8)}...', style: const TextStyle(fontSize: 10)),
-//               ],
-//             ],
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
-
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:sufcart_app/features/notification/service/push_notification_service.dart';
+import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sufcart_app/utilities/components/custom_button_one.dart';
@@ -209,17 +11,23 @@ import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 import '../../../utilities/components/sample_message_card.dart';
 import '../../../utilities/constants/sample_avatars.dart';
 
-class MyConnectionWelcomeScreen extends StatefulWidget {
-  const MyConnectionWelcomeScreen({super.key});
+class EnablePushNotificationScreen extends StatefulWidget {
+  const EnablePushNotificationScreen({super.key});
 
   @override
-  State<MyConnectionWelcomeScreen> createState() =>
-      _MyConnectionWelcomeScreenState();
+  State<EnablePushNotificationScreen> createState() =>
+      _EnablePushNotificationScreenState();
 }
 
-class _MyConnectionWelcomeScreenState extends State<MyConnectionWelcomeScreen> {
+class _EnablePushNotificationScreenState extends State<EnablePushNotificationScreen> {
   String formattedDate = '';
   String formattedTime = '';
+
+  final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+  bool _isLoading = false;
+  String? _deviceId;
+  String? _fcmToken;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -228,6 +36,110 @@ class _MyConnectionWelcomeScreenState extends State<MyConnectionWelcomeScreen> {
     DateTime now = DateTime.now();
     formattedDate = DateFormat('EEEE-MMMM d').format(now);
     formattedTime = DateFormat('jm').format(now);
+    _initialize();
+  }
+  Future<void> _initialize() async {
+    try {
+      setState(() => _isLoading = true);
+      await PushNotificationService.initialize();
+      await _getDeviceInfo();
+      await _getFCMToken();
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getDeviceInfo() async {
+    try {
+      String deviceId;
+
+      if (Platform.isAndroid) {
+        final androidInfo = await _deviceInfoPlugin.androidInfo;
+        deviceId = androidInfo.id;
+      } else if (Platform.isIOS) {
+        final iosInfo = await _deviceInfoPlugin.iosInfo;
+        deviceId = iosInfo.identifierForVendor ?? const Uuid().v4();
+      } else {
+        deviceId = const Uuid().v4();
+      }
+
+      setState(() => _deviceId = deviceId);
+    } catch (e) {
+      print('Error getting device info: $e');
+      setState(() => _errorMessage = 'Failed to get device information');
+    }
+  }
+
+  Future<void> _getFCMToken() async {
+    try {
+      final token = await PushNotificationService.firebaseMessaging.getToken();
+      if (token == null) throw Exception('Failed to get FCM token');
+      setState(() => _fcmToken = token);
+    } catch (e) {
+      print('Error getting FCM token: $e');
+      setState(() => _errorMessage = 'Failed to get notification token');
+    }
+  }
+
+  Future<void> _registerDevice() async {
+    try {
+      if (_deviceId == null || _fcmToken == null) {
+        throw Exception('Device information not available');
+      }
+
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      await PushNotificationService().registerDevice(
+        context: context,
+        deviceId: _deviceId!,
+        token: _fcmToken!,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notifications enabled successfully!')),
+      );
+    } catch (e) {
+      print('Error registering device: $e');
+      setState(() => _errorMessage = e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to enable notifications: ${e.toString()}')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _sendTestNotification() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      await PushNotificationService().sendTestNotification(
+        context: context,
+        title: "Test Notification",
+        body: "This is a test notification from your app!",
+        data: {'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Test notification sent!')),
+      );
+    } catch (e) {
+      print('Error sending test notification: $e');
+      setState(() => _errorMessage = e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send test: ${e.toString()}')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -365,7 +277,7 @@ class _MyConnectionWelcomeScreenState extends State<MyConnectionWelcomeScreen> {
                               ),
                             ),
                             const SizedBox(height: 10,),
-                            CustomButtonOne(title: "Enable Notifications", onClick: (){}, isLoading: false,),
+                            CustomButtonOne(title: "Enable Notifications", onClick: _registerDevice, isLoading: _isLoading,),
                             TextButton(
                                 style: TextButton.styleFrom(
                                   overlayColor: Colors.transparent,

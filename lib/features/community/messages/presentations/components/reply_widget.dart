@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import '../../../../utilities/constants/app_colors.dart';
+
+import '../../../../../utilities/constants/app_colors.dart';
 
 class ReplyWidget extends StatelessWidget {
   final String replyToContent;

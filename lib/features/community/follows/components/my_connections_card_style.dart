@@ -6,7 +6,7 @@ import 'package:sufcart_app/features/profile/model/user_model.dart';
 import 'package:sufcart_app/utilities/constants/app_colors.dart';
 
 import '../../../profile/model/user_provider.dart';
-import '../../messages/screens/chat_screen.dart';
+import '../../messages/presentations/screens/chat_screen.dart';
 
 class MyConnectionsCardStyle extends StatelessWidget {
   final UserModel user;
@@ -83,7 +83,7 @@ class MyConnectionsCardStyle extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        user.bio.isEmpty ? "Joined: ${DateFormat('MMMM d, y').format(DateTime.parse("${user.createdAt}"))}" : user.bio,
+                        user.bio.isEmpty ? "Joined: ${DateFormat('MMMM d, y').format(DateTime.parse("${user.createdAt}"))}" : user.bio.length > 25 ? "${user.bio.substring(0, 25)}..." : user.bio,
                         style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],

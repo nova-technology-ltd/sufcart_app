@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sufcart_app/features/community/follows/components/user_connections_card_one.dart';
 import 'package:sufcart_app/features/community/follows/screens/user_followers_and_followings_screen.dart';
 import 'package:sufcart_app/features/profile/model/user_provider.dart';
+import 'package:sufcart_app/features/settings/account_settings/screens/profile_settings.dart';
 import 'package:sufcart_app/utilities/components/app_bar_back_arrow.dart';
 import 'package:sufcart_app/utilities/components/read_more_text.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
@@ -11,6 +12,7 @@ import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 import '../../../../utilities/constants/app_colors.dart';
 import '../../../profile/model/user_model.dart';
 import '../../../settings/screen/settings_screen.dart';
+import '../../messages/presentations/screens/my_connections_screen.dart';
 import '../../posts/model/post_model.dart';
 import '../../posts/service/post_services.dart';
 import '../../repost/service/repost_service.dart';
@@ -272,7 +274,9 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                                         borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: MaterialButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfileSettings(userInfo: user)));
+                                        },
                                         padding: EdgeInsets.zero,
                                         child: Center(
                                           child: Text(
@@ -327,11 +331,16 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              Text(
-                                "See All",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Color(AppColors.primaryColor),
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const MyConnectionsScreen()));
+                                },
+                                child: Text(
+                                  "See All",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(AppColors.primaryColor),
+                                  ),
                                 ),
                               ),
                             ],
@@ -365,19 +374,16 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen>
                                 ),
                               );
                             } else if (snapshot.hasError) {
-                              return const Center(
-                                child: Text('No connections'),
-                              );
+                              return SizedBox.shrink();
                             } else if (!snapshot.hasData ||
                                 snapshot.data!.isEmpty) {
-                              return const Center(
-                                child: Text('No connections'),
-                              );
+                              return SizedBox.shrink();
                             }
 
                             final connections = snapshot.data!;
                             return SingleChildScrollView(
                               physics: const BouncingScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 5.0,

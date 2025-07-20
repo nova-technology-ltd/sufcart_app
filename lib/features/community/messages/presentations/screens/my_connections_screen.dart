@@ -5,10 +5,11 @@ import 'package:sufcart_app/features/community/follows/components/my_connections
 import 'package:sufcart_app/features/community/follows/services/follows_services.dart';
 import 'package:sufcart_app/utilities/components/app_bar_back_arrow.dart';
 
-import '../../../../utilities/constants/app_colors.dart';
-import '../../../../utilities/themes/theme_provider.dart';
-import '../../../profile/model/user_model.dart';
-import '../../../profile/model/user_provider.dart';
+import '../../../../../utilities/constants/app_colors.dart';
+import '../../../../../utilities/themes/theme_provider.dart';
+import '../../../../profile/model/user_model.dart';
+import '../../../../profile/model/user_provider.dart';
+
 
 class MyConnectionsScreen extends StatefulWidget {
   const MyConnectionsScreen({super.key});

@@ -3,7 +3,8 @@ import 'dart:math' as math;
 
 import 'package:iconly/iconly.dart';
 
-import '../../../profile/model/user_model.dart';
+import '../../../../profile/model/user_model.dart';
+
 
 class TypingIndicator extends StatefulWidget {
   final double dotSize;

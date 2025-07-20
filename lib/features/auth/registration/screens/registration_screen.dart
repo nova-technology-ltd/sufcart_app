@@ -3,7 +3,6 @@ import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sufcart_app/features/auth/registration/screens/registration_success_screen.dart';
-
 import '../../../../utilities/components/app_bar_back_arrow.dart';
 import '../../../../utilities/components/custom_button_one.dart';
 import '../../../../utilities/components/custom_text_field.dart';
@@ -73,7 +72,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     required String phoneNumber,
     required String email,
     required String password,
-    required String inviteCode,}
+    required String inviteCode,
+  }
   ) async {
     try {
       setState(() {
@@ -165,31 +165,92 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          CustomTextField(
-                            hintText: "First Name",
-                            prefixIcon: const Icon(IconlyLight.profile),
-                            isObscure: false,
-                            controller: firstNameController,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "First Name",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey
+                                ),
+                              ),
+                              CustomTextField(
+                                hintText: "e.g John",
+                                prefixIcon: null,
+                                isObscure: false,
+                                controller: firstNameController,
+                                outlineInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(
-                            height: 15,
+                            height: 10,
                           ),
-                          CustomTextField(
-                            hintText: "Last Name",
-                            prefixIcon: const Icon(IconlyLight.profile),
-                            isObscure: false,
-                            controller: lastNameNameController,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Last Name",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey
+                                ),
+                              ),
+                              CustomTextField(
+                                hintText: "e.g Doe",
+                                prefixIcon: null,
+                                isObscure: false,
+                                controller: lastNameNameController,
+                                outlineInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(
-                            height: 15,
+                            height: 10,
                           ),
-                          CustomTextField(
-                            hintText: "Other Names(optional)",
-                            prefixIcon: const Icon(IconlyLight.profile),
-                            isObscure: false,
-                            controller: otherNamesController,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Other Names(optional)",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey
+                                ),
+                              ),
+                              CustomTextField(
+                                hintText: "e.g khalid",
+                                prefixIcon: null,
+                                isObscure: false,
+                                controller: otherNamesController,
+                                outlineInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                              ),
+                            ],
                           ),
-                        ] else if (pageIndex == 1) ...[
+                        ]
+                        else if (pageIndex == 1) ...[
                           const Text(
                             "Phone Number",
                             style: TextStyle(
@@ -202,40 +263,34 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          SizedBox(
-                            height: 40,
-                            child: CustomTextField(
-                              hintText: "Phone Number",
-                              prefixIcon: SizedBox(
-                                width: 80,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        height: 25,
-                                          width: 25,
-                                          child: Image.asset("images/flag_icon.jpg")),
-                                      const Text(
-                                        " +234", style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.grey
-                                      ),
-                                      ),
-                                      const SizedBox(width: 5,),
-                                      Container(width: 1, height: 20, decoration: const BoxDecoration(
-                                        color: Colors.grey
-                                      ),)
-                                    ],
-                                  ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Phone Number",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey
                                 ),
                               ),
-                              isObscure: false,
-                              controller: phoneNumberController,
-                            ),
+                              CustomTextField(
+                                hintText: "e.g +234 0000...00",
+                                prefixIcon: null,
+                                isObscure: false,
+                                controller: phoneNumberController,
+                                outlineInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                              ),
+                            ],
                           ),
-                        ] else if (pageIndex == 2) ...[
+                        ]
+                        else if (pageIndex == 2) ...[
                           const Text(
                             "Email Address",
                             style: TextStyle(
@@ -248,13 +303,34 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          CustomTextField(
-                            hintText: "Email",
-                            prefixIcon: const Icon(IconlyLight.message),
-                            isObscure: false,
-                            controller: emailController,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Email",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey
+                                ),
+                              ),
+                              CustomTextField(
+                                hintText: "e.g johndoe@gmail.com",
+                                prefixIcon: null,
+                                isObscure: false,
+                                controller: emailController,
+                                outlineInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                              ),
+                            ],
                           ),
-                        ] else if (pageIndex == 3) ...[
+                        ]
+                          else if (pageIndex == 3) ...[
                           RichText(text: TextSpan(
                             children: [
                               TextSpan(
@@ -276,13 +352,34 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          CustomTextField(
-                            hintText: "K0O-R0A0D",
-                            prefixIcon: const Icon(IconlyLight.info_square),
-                            isObscure: false,
-                            controller: inviteCodeController,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Invitation Code",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey
+                                ),
+                              ),
+                              CustomTextField(
+                                hintText: "e.g N0O-M0A0D",
+                                prefixIcon: null,
+                                isObscure: false,
+                                controller: inviteCodeController,
+                                outlineInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                              ),
+                            ],
                           ),
-                        ] else ...[
+                        ]
+                            else ...[
                           const Text(
                             "Account Password",
                             style: TextStyle(
@@ -295,40 +392,51 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          CustomTextField(
-                            hintText: "Password",
-                            prefixIcon: SizedBox(
-                                height: 10,
-                                width: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14.0),
-                                  child: Image.asset(
-                                    "images/lock-outlined.png",
-                                    color: Colors.grey,
-                                  ),
-                                )),
-                            controller: passwordController,
-                            onChange: (value) {
-                              setState(() {});
-                            },
-                            isObscure: isEyeClicked ? true : false,
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isEyeClicked = !isEyeClicked;
-                                });
-                              },
-                              icon: SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: Image.asset(
-                                  isEyeClicked
-                                      ? AppIcons.eyeCloseIcon
-                                      : AppIcons.eyeOpenIcon,
-                                  color: Colors.grey,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Password",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey
                                 ),
                               ),
-                            ),
+                              CustomTextField(
+                                hintText: "e.g 123#\$sdsSW",
+                                prefixIcon: null,
+                                outlineInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                                controller: passwordController,
+                                onChange: (value) {
+                                  setState(() {});
+                                },
+                                isObscure: isEyeClicked ? true : false,
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isEyeClicked = !isEyeClicked;
+                                    });
+                                  },
+                                  icon: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: Image.asset(
+                                      isEyeClicked
+                                          ? AppIcons.eyeCloseIcon
+                                          : AppIcons.eyeOpenIcon,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(
                             height: 8,
@@ -372,39 +480,50 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           const SizedBox(
                             height: 15,
                           ),
-                          CustomTextField(
-                            hintText: "Confirm Password",
-                            prefixIcon: SizedBox(
-                                height: 10,
-                                width: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14.0),
-                                  child: Image.asset(
-                                    "images/lock-outlined.png",
-                                    color: Colors.grey,
-                                  ),
-                                )),
-                            controller: conPasswordController,
-                            isObscure: isEyeClicked ? true : false,
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isEyeClicked = !isEyeClicked;
-                                });
-                              },
-                              icon: SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: Image.asset(
-                                  isEyeClicked
-                                      ? AppIcons.eyeCloseIcon
-                                      : AppIcons.eyeOpenIcon,
-                                  color: Colors.grey,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Confirm Password",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey
                                 ),
                               ),
-                            ),
+                              CustomTextField(
+                                hintText: "e.g 123#\$sdsSW",
+                                prefixIcon: null,
+                                outlineInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                ),
+                                outlineFocusInputBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                ),
+                                controller: conPasswordController,
+                                isObscure: isEyeClicked ? true : false,
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isEyeClicked = !isEyeClicked;
+                                    });
+                                  },
+                                  icon: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: Image.asset(
+                                      isEyeClicked
+                                          ? AppIcons.eyeCloseIcon
+                                          : AppIcons.eyeOpenIcon,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 25,),
+                          const SizedBox(height: 15,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -448,7 +567,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(height: 10,),
+                          const SizedBox(height: 5,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -500,7 +619,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               },
             ),
             bottomNavigationBar: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              padding: const EdgeInsets.only(left: 10.0, right: 10, bottom: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

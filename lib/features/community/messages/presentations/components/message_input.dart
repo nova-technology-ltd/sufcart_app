@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import '../../../../utilities/constants/app_colors.dart';
-import '../../repost/components/emoji_bottom_sheet.dart';
+
+import '../../../../../utilities/constants/app_colors.dart';
+import '../../../repost/components/emoji_bottom_sheet.dart';
 
 class MessageInput extends StatelessWidget {
   final TextEditingController messageController;
