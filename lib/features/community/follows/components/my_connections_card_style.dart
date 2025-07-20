@@ -36,7 +36,7 @@ class MyConnectionsCardStyle extends StatelessWidget {
                 : fullName
             : 'Unknown User';
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2),
       child: Container(
         height: 45,
         width: MediaQuery.of(context).size.width,
@@ -78,8 +78,7 @@ class MyConnectionsCardStyle extends StatelessWidget {
                       Text(
                         displayName,
                         style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
                         ),
                       ),
                       Text(

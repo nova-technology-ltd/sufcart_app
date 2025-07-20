@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:sufcart_app/features/community/follows/screens/user_connection_screen.dart';
 import 'package:sufcart_app/features/community/follows/screens/user_followers_and_followings_screen.dart';
 import 'package:sufcart_app/features/community/follows/section/profile_post_tab_section.dart';
 import 'package:sufcart_app/features/community/follows/section/profile_repost_section.dart';
@@ -191,6 +192,20 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       followsProvider,
     );
     return buttonText == "Follow" || buttonText == "Follow back";
+  }
+
+  String _maskEmail(String email) {
+    if (email.isEmpty) return "";
+    final parts = email.split('@');
+
+    if (parts.length != 2) return email;
+
+    final localPart = parts[0];
+    final domainPart = parts[1];
+    final maskedLocalPart = localPart.length > 2
+        ? localPart.substring(0, 2) + '*' * (localPart.length - 2)
+        : localPart;
+    return '$maskedLocalPart@$domainPart';
   }
 
   @override
@@ -574,7 +589,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                             ),
                           ),
                           Text(
-                            widget.user.email,
+                            _maskEmail(widget.user.email),
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                           widget.user.bio.isEmpty
@@ -605,7 +620,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                               ),
                               GestureDetector(
                                 onTap: (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const MyConnectionsScreen()));
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget.user.userID == currentUser.userID ? MyConnectionsScreen() : UserConnectionScreen(userModel: widget.user)));
                                 },
                                 child: Text(
                                   "See All",
