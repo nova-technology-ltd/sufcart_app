@@ -603,72 +603,72 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Connections",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget.user.userID == currentUser.userID ? MyConnectionsScreen() : UserConnectionScreen(userModel: widget.user)));
-                                },
-                                child: Text(
-                                  "See All",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(AppColors.primaryColor),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        FutureBuilder<List<UserModel>>(
-                          future: _futureConnections,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
-                                    for (int i = 0; i < 9; i++)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 5.0,
-                                        ),
-                                        child: Container(
-                                          height: 55,
-                                          width: 55,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.withOpacity(0.2),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
+                    FutureBuilder<List<UserModel>>(
+                      future: _futureConnections,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                for (int i = 0; i < 9; i++)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 5.0,
+                                    ),
+                                    child: Container(
+                                      height: 55,
+                                      width: 55,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.withOpacity(0.2),
+                                        shape: BoxShape.circle,
                                       ),
-                                  ],
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return SizedBox.shrink();
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return SizedBox.shrink();
-                            }
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return SizedBox.shrink();
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return SizedBox.shrink();
+                        }
 
-                            final connections = snapshot.data!;
-                            return SingleChildScrollView(
+                        final connections = snapshot.data!;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Connections",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget.user.userID == currentUser.userID ? MyConnectionsScreen() : UserConnectionScreen(userModel: widget.user)));
+                                    },
+                                    child: Text(
+                                      "See All",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Color(AppColors.primaryColor),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            SingleChildScrollView(
                               physics: const BouncingScrollPhysics(),
                               scrollDirection: Axis.horizontal,
                               child: Padding(
@@ -697,10 +697,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                   }).toList(),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),

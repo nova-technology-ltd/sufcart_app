@@ -7,6 +7,7 @@ class UserProvider extends ChangeNotifier {
   UserModel _userModel = UserModel(
     id: '',
     userID: '',
+    googleId: '',
     firstName: '',
     lastName: '',
     otherNames: '',

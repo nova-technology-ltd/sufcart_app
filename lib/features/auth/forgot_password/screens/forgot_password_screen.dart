@@ -74,14 +74,31 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 10,),
-                  CustomTextField(
-                    hintText: "example@gmail.com",
-                    prefixIcon: SizedBox(height: 10, width: 10,child: Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Image.asset("images/messages-outlined.png", color: Colors.grey,),
-                    )),
-                    controller: forgotPasswordEmailController,
-                    isObscure: false,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Email",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey
+                        ),
+                      ),
+                      CustomTextField(
+                        hintText: "e.g johndoe@gmail.com",
+                        prefixIcon: null,
+                        controller: forgotPasswordEmailController,
+                        isObscure: false,
+                        outlineInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                        ),
+                        outlineFocusInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                        ),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   CustomButtonOne(title: "Recover Password", onClick: (){

@@ -93,16 +93,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     isObscure: isEyeClicked ? false : true,
                     controller: oldPasswordController,
                     hintText: "Old Password",
-                    prefixIcon: SizedBox(
-                        height: 10,
-                        width: 10,
-                        child: Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Image.asset(
-                            "images/lock-outlined.png",
-                            color: Colors.grey,
-                          ),
-                        )),
+                    prefixIcon: null,
+                    outlineInputBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                    ),
+                    outlineFocusInputBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                    ),
                     suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
@@ -126,16 +125,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       setState(() {});
                     },
                     hintText: "Enter password",
-                    prefixIcon: SizedBox(
-                        height: 10,
-                        width: 10,
-                        child: Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Image.asset(
-                            "images/lock-outlined.png",
-                            color: Colors.grey,
-                          ),
-                        )),
+                    prefixIcon: null,
+                    outlineInputBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                    ),
+                    outlineFocusInputBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                    ),
                     suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {

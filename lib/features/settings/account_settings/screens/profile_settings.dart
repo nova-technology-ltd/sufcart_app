@@ -124,6 +124,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
 
   // Show the CupertinoDatePicker
   void _showDatePicker() {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {
@@ -133,7 +134,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
             height: 250,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: themeProvider.isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white,
               borderRadius: BorderRadius.circular(25),
             ),
             child: CupertinoDatePicker(
@@ -250,9 +251,9 @@ class _ProfileSettingsState extends State<ProfileSettings> {
               actions: [
                 IconButton(
                   onPressed: () => _startProfileUpdate(context),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.check,
-                    color: Color(AppColors.primaryColor),
+                    color: themeProvider.isDarkMode ? Colors.grey : Color(AppColors.primaryColor),
                   ),
                 ),
               ],
@@ -349,25 +350,23 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           SizedBox(
                             height: 40,
                             child: CustomTextField(
-                              hintText: "First Name",
-                              prefixIcon: SizedBox(
-                                height: 10,
-                                width: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Image.asset(
-                                    "images/profile_outlined.png",
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
+                              hintText: "e.g John",
+                              prefixIcon: null,
                               isObscure: false,
                               controller: firstNameController,
+                              outlineInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                              ),
+                              outlineFocusInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -381,25 +380,23 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           SizedBox(
                             height: 40,
                             child: CustomTextField(
-                              hintText: "Last Name",
-                              prefixIcon: SizedBox(
-                                height: 10,
-                                width: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Image.asset(
-                                    "images/profile_outlined.png",
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
+                              hintText: "e.g Doe",
+                              prefixIcon: null,
                               isObscure: false,
                               controller: lastNameController,
+                              outlineInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                              ),
+                              outlineFocusInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -413,25 +410,23 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           SizedBox(
                             height: 40,
                             child: CustomTextField(
-                              hintText: "other Names (optional)",
-                              prefixIcon: SizedBox(
-                                height: 10,
-                                width: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Image.asset(
-                                    "images/profile_outlined.png",
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
+                              hintText: "e.g khalid",
+                              prefixIcon: null,
                               isObscure: false,
                               controller: otherNameController,
+                              outlineInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                              ),
+                              outlineFocusInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -445,25 +440,23 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           SizedBox(
                             height: 40,
                             child: CustomTextField(
-                              hintText: "Phone Number",
-                              prefixIcon: SizedBox(
-                                height: 10,
-                                width: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Image.asset(
-                                    "images/feather_phone.png",
-                                    color: Colors.grey,
-                                  ),
-                                ),
+                              hintText: "e.g +234 0000..00",
+                              outlineInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
                               ),
+                              outlineFocusInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                              ),
+                              prefixIcon: null,
                               isObscure: false,
                               controller: phoneNumberController,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -482,11 +475,22 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                               maxLine: 5,
                               isObscure: false,
                               controller: userBioController,
+                              style: TextStyle(
+                                fontSize: 12
+                              ),
+                              outlineInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                              ),
+                              outlineFocusInputBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -550,7 +554,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                       child: Text(
                                         gender,
                                         style: const TextStyle(
-                                          color: Colors.black,
                                           fontSize: 10,
                                         ),
                                       ),
@@ -574,20 +577,18 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                             children: [
                               Expanded(
                                 child: CustomTextField(
-                                  hintText: "mm/dd/yyyy",
-                                  prefixIcon: SizedBox(
-                                    height: 10,
-                                    width: 10,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(14.0),
-                                      child: Image.asset(
-                                        "images/calendar_outlined.png",
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
+                                  hintText: "e.g mm/dd/yyyy",
+                                  prefixIcon: null,
                                   isObscure: false,
                                   controller: dateOfBirthController,
+                                  outlineInputBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                                  ),
+                                  outlineFocusInputBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -599,7 +600,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                   decoration: BoxDecoration(
                                     color:
                                         themeProvider.isDarkMode
-                                            ? null
+                                            ? Color(AppColors.primaryColorDarkMode)
                                             : Colors.white,
                                     shape: BoxShape.circle,
                                     boxShadow: [
@@ -611,10 +612,10 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                       ),
                                     ],
                                   ),
-                                  child: const Center(
+                                  child: Center(
                                     child: Icon(
                                       IconlyLight.calendar,
-                                      color: Color(AppColors.primaryColor),
+                                      color: themeProvider.isDarkMode ? Colors.grey : Color(AppColors.primaryColor),
                                     ),
                                   ),
                                 ),
@@ -628,26 +629,26 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                         height: 60,
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
-                          color: const Color(
+                          color: themeProvider.isDarkMode ? Colors.grey.withOpacity(0.08): const Color(
                             AppColors.primaryColor,
                           ).withOpacity(0.08),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.announcement_outlined,
-                                color: Color(AppColors.primaryColor),
+                                color: themeProvider.isDarkMode ? Colors.grey : Color(AppColors.primaryColor),
                               ),
                               SizedBox(width: 5),
                               Expanded(
                                 child: Text(
                                   "Please make sure your date of birth follows this format \"mm/dd/yyy\", the 'MM' is for the Month, the 'DD' is for the Day and the 'YYYY' is for the Year",
                                   style: TextStyle(
-                                    color: Color(AppColors.primaryColor),
+                                    color: themeProvider.isDarkMode ? Colors.grey : Color(AppColors.primaryColor),
                                     fontSize: 11,
                                     fontWeight: FontWeight.w400,
                                   ),

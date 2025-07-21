@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final IconButton? suffixIcon;
   final bool isObscure;
   final double? corner;
+  final TextStyle? style;
   final Color? bg;
   final Color? hintColor;
   final OutlineInputBorder? outlineInputBorder;
@@ -36,7 +37,7 @@ class CustomTextField extends StatelessWidget {
     this.focusNode,
     this.maxLine,
     this.onSaved,
-    this.validator, this.hasBG, this.bg, this.hintColor, this.outlineInputBorder, this.outlineFocusInputBorder,
+    this.validator, this.hasBG, this.bg, this.hintColor, this.outlineInputBorder, this.outlineFocusInputBorder, this.style,
   });
 
   @override
@@ -52,6 +53,7 @@ class CustomTextField extends StatelessWidget {
       cursorColor: Colors.grey,
       onSaved: onSaved,
       readOnly: readOnly ?? false,
+      style: style,
       validator: validator,
       decoration: InputDecoration(
         border: outlineInputBorder ?? OutlineInputBorder(

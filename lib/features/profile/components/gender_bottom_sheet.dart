@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 
 import '../../../utilities/constants/app_colors.dart';
 
@@ -9,6 +11,7 @@ class GenderBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Material(
       color: Colors.transparent,
       child: Padding(
@@ -17,7 +20,7 @@ class GenderBottomSheet extends StatelessWidget {
           height: 205,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(20)),
+              color: isDarkMode ? Color(AppColors.primaryColorDarkMode) : Colors.white, borderRadius: BorderRadius.circular(20)),
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -49,14 +52,14 @@ class GenderBottomSheet extends StatelessWidget {
                                 height: 25,
                                 width: 25,
                                 decoration: BoxDecoration(
-                                    color: const Color(AppColors.primaryColor)
+                                    color: isDarkMode ? Colors.grey.withOpacity(0.2) : const Color(AppColors.primaryColor)
                                         .withOpacity(0.2),
                                     shape: BoxShape.circle),
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
                                     Icons.arrow_back_outlined,
                                     size: 16,
-                                    color: Color(AppColors.primaryColor),
+                                    color: isDarkMode ? Colors.grey : Color(AppColors.primaryColor),
                                   ),
                                 ),
                               ),
@@ -66,15 +69,15 @@ class GenderBottomSheet extends StatelessWidget {
                               const Text(
                                 "Male",
                                 style: TextStyle(
-                                    fontSize: 12, color: Colors.black),
+                                    fontSize: 12),
                               )
                             ],
                           ),
                           Container(
                             height: 15,
                             width: 15,
-                            decoration: const BoxDecoration(
-                                color: Color(AppColors.primaryColor), shape: BoxShape.circle),
+                            decoration: BoxDecoration(
+                                color: isDarkMode ? Colors.grey : Color(AppColors.primaryColor), shape: BoxShape.circle),
                           )
                         ],
                       ),
@@ -104,14 +107,14 @@ class GenderBottomSheet extends StatelessWidget {
                                 height: 25,
                                 width: 25,
                                 decoration: BoxDecoration(
-                                    color: const Color(AppColors.primaryColor)
+                                    color: isDarkMode ? Colors.grey.withOpacity(0.2) : const Color(AppColors.primaryColor)
                                         .withOpacity(0.2),
                                     shape: BoxShape.circle),
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
                                     Icons.keyboard_arrow_right,
                                     size: 16,
-                                    color: Color(AppColors.primaryColor),
+                                    color: isDarkMode ? Colors.grey : Color(AppColors.primaryColor),
                                   ),
                                 ),
                               ),
@@ -121,15 +124,15 @@ class GenderBottomSheet extends StatelessWidget {
                               const Text(
                                 "Female",
                                 style: TextStyle(
-                                    fontSize: 12, color: Colors.black),
+                                    fontSize: 12),
                               )
                             ],
                           ),
                           Container(
                             height: 15,
                             width: 15,
-                            decoration: const BoxDecoration(
-                                color: Color(AppColors.primaryColor),
+                            decoration: BoxDecoration(
+                                color: isDarkMode ? Colors.grey : Color(AppColors.primaryColor),
                                 shape: BoxShape.circle),
                           ),
                         ],
@@ -142,21 +145,21 @@ class GenderBottomSheet extends StatelessWidget {
                   height: 70,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
-                    color: const Color(AppColors.primaryColor).withOpacity(0.05),
+                    color: isDarkMode ? Colors.grey.withOpacity(0.05) : const Color(AppColors.primaryColor).withOpacity(0.05),
                     borderRadius: BorderRadius.circular(10)
                   ),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_rounded, color: Color(AppColors.primaryColor),),
+                        Icon(Icons.warning_rounded, color: isDarkMode ? Colors.grey : Color(AppColors.primaryColor),),
                         SizedBox(width: 10,),
                         Expanded(child: Text(
                           "Please make sure to provide your actual gender, this is to help us serve you well and make sure your experience with us is unique.",
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w400,
-                            color: Color(AppColors.primaryColor)
+                            color: isDarkMode ? Colors.grey : Color(AppColors.primaryColor)
                           ),
                         ))
                       ],

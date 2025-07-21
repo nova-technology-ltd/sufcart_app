@@ -124,6 +124,7 @@ class MessagesSocketServices {
             UserModel(
               id: '',
               userID: data['userID'],
+              googleId: '',
               firstName: '',
               lastName: '',
               otherNames: '',

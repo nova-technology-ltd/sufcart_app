@@ -101,40 +101,51 @@ class _ResetNewPasswordScreenState extends State<ResetNewPasswordScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  CustomTextField(
-                    isObscure: isEyeClicked ? false : true,
-                    controller: setNewPasswordController,
-                    onChange: (value) {
-                      setState(() {});
-                    },
-                    hintText: "Enter password",
-                    prefixIcon: SizedBox(
-                        height: 10,
-                        width: 10,
-                        child: Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Image.asset(
-                            "images/lock-outlined.png",
-                            color: Colors.grey,
-                          ),
-                        )),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isEyeClicked = !isEyeClicked;
-                        });
-                      },
-                      icon: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: Image.asset(
-                          isEyeClicked
-                              ? AppIcons.eyeCloseIcon
-                              : AppIcons.eyeOpenIcon,
-                          color: Colors.grey,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Password",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey
                         ),
                       ),
-                    ),
+                      CustomTextField(
+                        isObscure: isEyeClicked ? false : true,
+                        controller: setNewPasswordController,
+                        onChange: (value) {
+                          setState(() {});
+                        },
+                        hintText: "e.g *******",
+                        prefixIcon: null,
+                        outlineInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                        ),
+                        outlineFocusInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                        ),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isEyeClicked = !isEyeClicked;
+                            });
+                          },
+                          icon: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: Image.asset(
+                              isEyeClicked
+                                  ? AppIcons.eyeCloseIcon
+                                  : AppIcons.eyeOpenIcon,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 8,
@@ -178,40 +189,51 @@ class _ResetNewPasswordScreenState extends State<ResetNewPasswordScreen> {
                   const SizedBox(
                     height: 15,
                   ),
-                  CustomTextField(
-                    isObscure: isEyeClicked ? false : true,
-                    controller: confirmSetNewPasswordController,
-                    onChange: (value) {
-                      setState(() {});
-                    },
-                    hintText: "Confirm password",
-                    prefixIcon: SizedBox(
-                        height: 10,
-                        width: 10,
-                        child: Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Image.asset(
-                            "images/lock-outlined.png",
-                            color: Colors.grey,
-                          ),
-                        )),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isEyeClicked = !isEyeClicked;
-                        });
-                      },
-                      icon: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: Image.asset(
-                          isEyeClicked
-                              ? AppIcons.eyeCloseIcon
-                              : AppIcons.eyeOpenIcon,
-                          color: Colors.grey,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Confirm Password",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey
                         ),
                       ),
-                    ),
+                      CustomTextField(
+                        isObscure: isEyeClicked ? false : true,
+                        controller: confirmSetNewPasswordController,
+                        onChange: (value) {
+                          setState(() {});
+                        },
+                        hintText: "e.g ********",
+                        prefixIcon: null,
+                        outlineInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1.5)
+                        ),
+                        outlineFocusInputBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Color(AppColors.primaryColor).withOpacity(0.3), width: 1.5)
+                        ),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isEyeClicked = !isEyeClicked;
+                            });
+                          },
+                          icon: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: Image.asset(
+                              isEyeClicked
+                                  ? AppIcons.eyeCloseIcon
+                                  : AppIcons.eyeOpenIcon,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   CustomButtonOne(

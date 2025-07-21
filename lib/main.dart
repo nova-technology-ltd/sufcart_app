@@ -8,6 +8,7 @@ import 'package:sufcart_app/state_management/shared_preference_provider.dart';
 import 'package:sufcart_app/utilities/socket/socket_config_provider.dart';
 import 'package:sufcart_app/utilities/themes/theme_provider.dart';
 import 'features/auth/service/auth_service.dart';
+import 'features/auth/service/google_sign_in_service.dart';
 import 'features/community/messages/data/provider/messages_socket_provider.dart';
 import 'features/community/posts/screen/image_view_screen.dart';
 import 'features/community/follows/socket/follows_socket_provider.dart';
@@ -20,10 +21,10 @@ import 'state_management/shared_preference_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   // Initialize Firebase
   await Firebase.initializeApp();
   final sharedPreferencesService = await SharedPreferencesService.getInstance();
-  final PushNotificationService notificationService = PushNotificationService();
   runApp(
     MultiProvider(
       providers: [
@@ -87,7 +88,7 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.getTheme(),
           darkTheme: ThemeData.dark(),
           themeMode: ThemeMode.system,
-          // home: const MyConnectionWelcomeScreen(),
+          // home: const EnablePushNotificationScreen(),
           home: const SplashScreen(),
           // home: const OnboardingScreen(),
         ),

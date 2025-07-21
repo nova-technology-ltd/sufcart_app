@@ -7,6 +7,7 @@ import '../../settings/model/user_settings_model.dart';
 class UserModel {
   final String id;
   final String userID;
+  final String googleId;
   final String firstName;
   final String lastName;
   final String otherNames;
@@ -42,6 +43,7 @@ class UserModel {
   UserModel({
     required this.id,
     required this.userID,
+    required this.googleId,
     required this.firstName,
     required this.lastName,
     required this.otherNames,
@@ -134,6 +136,7 @@ class UserModel {
     return UserModel(
       id: map['_id']?.toString() ?? '',
       userID: map['userID']?.toString() ?? '',
+      googleId: map['googleId']?.toString() ?? '',
       firstName: map['firstName']?.toString() ?? '',
       lastName: map['lastName']?.toString() ?? '',
       otherNames: map['otherNames']?.toString() ?? '',
@@ -172,6 +175,7 @@ class UserModel {
     return {
       '_id': id,
       'userID': userID,
+      'googleId': googleId,
       'firstName': firstName,
       'lastName': lastName,
       'otherNames': otherNames,
@@ -213,6 +217,7 @@ class UserModel {
   UserModel copyWith({
     String? id,
     String? userID,
+    String? googleId,
     String? firstName,
     String? lastName,
     String? otherNames,
@@ -250,6 +255,7 @@ class UserModel {
     return UserModel(
       id: id ?? this.id,
       userID: userID ?? this.userID,
+      googleId: googleId ?? this.googleId,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       otherNames: otherNames ?? this.otherNames,
